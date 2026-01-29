@@ -3,6 +3,7 @@
 ## Project Context
 
 JOOGLE is a Blue Archive-themed Google clone search engine built with:
+
 - **Runtime**: Deno
 - **Build**: Vite
 - **UI**: Preact
@@ -74,7 +75,7 @@ export function Component({ prop }: ComponentProps) {
 
 ```typescript
 // stores/example.ts
-import { signal, computed } from "@preact/signals"
+import { computed, signal } from "@preact/signals"
 
 // Primitive signals
 export const query = signal("")
@@ -143,15 +144,15 @@ Format: `<type>(<scope>): <description>`
 
 #### Types
 
-| Type | Description |
-|------|-------------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation |
-| `style` | Formatting (no code change) |
-| `refactor` | Code restructuring |
-| `test` | Adding/updating tests |
-| `chore` | Maintenance |
+| Type       | Description                 |
+| ---------- | --------------------------- |
+| `feat`     | New feature                 |
+| `fix`      | Bug fix                     |
+| `docs`     | Documentation               |
+| `style`    | Formatting (no code change) |
+| `refactor` | Code restructuring          |
+| `test`     | Adding/updating tests       |
+| `chore`    | Maintenance                 |
 
 #### Examples
 
@@ -181,7 +182,7 @@ chore: update dependencies
 ### Test Structure
 
 ```typescript
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { render, screen } from "@testing-library/preact"
 import { SearchBar } from "./SearchBar"
 
@@ -240,6 +241,7 @@ deno lint          # Lint code
 ### Character Data
 
 Characters should include:
+
 - Korean name (한글)
 - Japanese name (日本語)
 - English name
@@ -250,6 +252,7 @@ Characters should include:
 ### Search Terms
 
 Common search terms include:
+
 - Character names
 - School names (게헨나, 트리니티, etc.)
 - Game mechanics (총력전, 대결전, etc.)
@@ -258,6 +261,7 @@ Common search terms include:
 ### Tone
 
 JOOGLE should be:
+
 - Professional but playful
 - Blue Archive-themed
 - Accessible to both Korean and Japanese speakers
@@ -272,6 +276,7 @@ JOOGLE should be:
 ## Questions?
 
 Open an issue or discussion for:
+
 - Architecture questions
 - Feature proposals
 - Bug reports

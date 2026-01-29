@@ -1,33 +1,51 @@
-import "./app.css"
-import { useState } from "preact/hooks"
-import preactLogo from "./assets/preact.svg"
+import "./styles/global.css"
+import { signal } from "@preact/signals"
+import { Home } from "./pages/Home/Home.tsx"
+import { Results } from "./pages/Results/Results.tsx"
+import { Footer } from "./components/Footer/Footer.tsx"
+import { clearQuery } from "./stores/search.ts"
+
+type Page = "home" | "results"
+
+const currentPage = signal<Page>("home")
 
 export function App() {
-  const [count, setCount] = useState(0)
+  const navigateToResults = () => {
+    currentPage.value = "results"
+    window.history.pushState({}, "", "#/search")
+  }
+
+  const navigateToHome = () => {
+    currentPage.value = "home"
+    clearQuery()
+    window.history.pushState({}, "", "#/")
+  }
+
+  if (typeof window !== "undefined") {
+    window.addEventListener("popstate", () => {
+      if (window.location.hash === "#/search") {
+        currentPage.value = "results"
+      } else {
+        currentPage.value = "home"
+        clearQuery()
+      }
+    })
+
+    if (window.location.hash === "#/search") {
+      currentPage.value = "results"
+    }
+  }
 
   return (
     <>
-      <img src="/vite-deno.svg" alt="Vite with Deno" />
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" class="logo" alt="Vite logo" />
-        </a>
-        <a href="https://preactjs.com" target="_blank">
-          <img src={preactLogo} class="logo preact" alt="Preact logo" />
-        </a>
-      </div>
-      <h1>Vite + Preact</h1>
-      <div class="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/app.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p class="read-the-docs">
-        Click on the Vite and Preact logos to learn more
-      </p>
+      {currentPage.value === "home"
+        ? (
+          <>
+            <Home onNavigateToResults={navigateToResults} />
+            <Footer />
+          </>
+        )
+        : <Results onNavigateToHome={navigateToHome} />}
     </>
   )
 }

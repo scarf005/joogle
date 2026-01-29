@@ -1,0 +1,116 @@
+.search-bar {
+  position: relative;
+  width: 100%;
+  max-width: var(--search-bar-width);
+}
+
+.search-bar__wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--search-bar-height);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  padding: 0 14px;
+  background: var(--color-bg-primary);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.search-bar__wrapper:hover {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  border-color: rgba(223, 225, 229, 0);
+}
+
+.search-bar__wrapper:focus-within {
+  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+  border-color: rgba(223, 225, 229, 0);
+}
+
+.search-bar__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 13px;
+  color: #9aa0a6;
+}
+
+.search-bar__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.search-bar__input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.search-bar__input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.search-bar__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 8px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.search-bar__clear--visible {
+  opacity: 1;
+}
+
+.search-bar__clear:hover {
+  color: var(--color-text-primary);
+}
+
+.search-bar__suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(32, 33, 36, 0.28);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-bar__suggestion {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.search-bar__suggestion:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.search-bar__suggestion-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 13px;
+  color: var(--color-text-secondary);
+}
+
+.search-bar__suggestion-text {
+  font-size: 16px;
+  color: var(--color-text-primary);
+}

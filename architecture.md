@@ -65,17 +65,20 @@ App
 ### Component Specifications
 
 #### Logo Component
+
 ```typescript
 interface LogoProps {
-  size?: 'small' | 'large'
+  size?: "small" | "large"
   animated?: boolean
 }
 ```
+
 - Large: 272x92px (home page)
 - Small: 92x30px (results page)
 - Uses Google's color scheme for letters
 
 #### SearchBar Component
+
 ```typescript
 interface SearchBarProps {
   value: Signal<string>
@@ -84,18 +87,21 @@ interface SearchBarProps {
   autoFocus?: boolean
 }
 ```
+
 - 582px max width, 44px height
 - Search icon (left), clear button (right)
 - Autocomplete dropdown
 
 #### SearchButton Component
+
 ```typescript
 interface SearchButtonProps {
-  variant: 'primary' | 'secondary'
+  variant: "primary" | "secondary"
   onClick: () => void
   children: string
 }
 ```
+
 - Primary: "Joogle 검색" / "Joogle Search"
 - Secondary: "I'm Feeling Lucky"
 
@@ -105,20 +111,16 @@ interface SearchButtonProps {
 
 ```typescript
 // stores/search.ts
-import { signal, computed } from "@preact/signals"
+import { computed, signal } from "@preact/signals"
 
 export const searchQuery = signal("")
 export const searchResults = signal<SearchResult[]>([])
 export const isLoading = signal(false)
-export const suggestions = computed(() => 
-  getSuggestions(searchQuery.value)
-)
+export const suggestions = computed(() => getSuggestions(searchQuery.value))
 
 // stores/locale.ts
 export const locale = signal<"ko" | "ja">("ko")
-export const messages = computed(() => 
-  loadMessages(locale.value)
-)
+export const messages = computed(() => loadMessages(locale.value))
 
 // stores/easter.ts
 export const easterEggActive = signal(false)
@@ -341,11 +343,13 @@ src/
 ## Build & Development
 
 ### Development
+
 ```bash
 deno task dev      # Start Vite dev server
 ```
 
 ### Production
+
 ```bash
 deno task build    # Build for production
 deno task preview  # Preview production build
@@ -353,6 +357,7 @@ deno task serve    # Serve production build
 ```
 
 ### Testing
+
 ```bash
 deno task test     # Run Vitest tests
 deno task test:ui  # Run tests with UI

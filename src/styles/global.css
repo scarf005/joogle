@@ -1,0 +1,97 @@
+:root {
+  --color-text-primary: #202124;
+  --color-text-secondary: #5f6368;
+  --color-text-link: #1a0dab;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f9fa;
+  --color-bg-hover: #f1f3f4;
+  --color-border: #dfe1e5;
+  --color-border-focus: #4285f4;
+
+  --color-joogle-blue: #4285f4;
+  --color-joogle-red: #ea4335;
+  --color-joogle-yellow: #fbbc05;
+  --color-joogle-green: #34a853;
+
+  --font-family: Arial, sans-serif;
+  --search-bar-width: 582px;
+  --search-bar-height: 44px;
+  --logo-width: 272px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-text-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input {
+  font-family: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes joogle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes joogle-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.joogle-mode {
+  animation: joogle-bounce 0.5s ease-in-out;
+}

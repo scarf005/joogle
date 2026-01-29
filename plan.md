@@ -2,31 +2,37 @@
 
 ## Project Overview
 
-JOOGLE is a Google-clone search engine designed specifically for Blue Archive players. The name "JOOGLE" is a playful combination that references the game's aesthetic and community culture.
+JOOGLE is a Google-clone search engine designed specifically for Blue Archive
+players. The name "JOOGLE" is a playful combination that references the game's
+aesthetic and community culture.
 
 ### Why JOOGLE?
 
-Inspired by the Blue Archive character "이오치 마리" (Iochi Mari), JOOGLE serves as a dedicated search portal for the Blue Archive community, providing quick access to character information, game guides, and community resources.
+Inspired by the Blue Archive character "이오치 마리" (Iochi Mari), JOOGLE serves
+as a dedicated search portal for the Blue Archive community, providing quick
+access to character information, game guides, and community resources.
 
 ## Goals
 
-1. **Pixel-perfect Google Clone** - Replicate Google's minimalist homepage design
-2. **Blue Archive Integration** - Serve as a specialized search engine for BA content
+1. **Pixel-perfect Google Clone** - Replicate Google's minimalist homepage
+   design
+2. **Blue Archive Integration** - Serve as a specialized search engine for BA
+   content
 3. **Internationalization** - Support Korean (primary), Japanese (secondary)
 4. **Modern Stack** - Deno + Vite + Preact + Signals
 5. **Easter Eggs** - Hidden features for community engagement
 
 ## Tech Stack
 
-| Technology | Purpose |
-|------------|---------|
-| Deno | Runtime environment |
-| Vite | Build tool & dev server |
-| Preact | UI framework (lightweight React alternative) |
-| @preact/signals | State management |
-| Lingui | Internationalization (i18n) |
-| Vitest | Testing framework |
-| TypeScript | Type safety |
+| Technology      | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| Deno            | Runtime environment                          |
+| Vite            | Build tool & dev server                      |
+| Preact          | UI framework (lightweight React alternative) |
+| @preact/signals | State management                             |
+| Lingui          | Internationalization (i18n)                  |
+| Vitest          | Testing framework                            |
+| TypeScript      | Type safety                                  |
 
 ## Project Structure
 
@@ -110,19 +116,19 @@ joogle/
 
 ### Color Palette
 
-| Element | Color | Notes |
-|---------|-------|-------|
-| Background | #ffffff | Clean white |
-| Text Primary | #202124 | Google dark gray |
+| Element        | Color   | Notes             |
+| -------------- | ------- | ----------------- |
+| Background     | #ffffff | Clean white       |
+| Text Primary   | #202124 | Google dark gray  |
 | Text Secondary | #5f6368 | Google light gray |
-| Link | #1a0dab | Google blue |
-| Button BG | #f8f9fa | Light gray |
-| Button Border | #f8f9fa | Same as BG |
-| Button Hover | #f1f3f4 | Slightly darker |
-| JOOGLE Blue | #4285f4 | Google blue |
-| JOOGLE Red | #ea4335 | Google red |
-| JOOGLE Yellow | #fbbc05 | Google yellow |
-| JOOGLE Green | #34a853 | Google green |
+| Link           | #1a0dab | Google blue       |
+| Button BG      | #f8f9fa | Light gray        |
+| Button Border  | #f8f9fa | Same as BG        |
+| Button Hover   | #f1f3f4 | Slightly darker   |
+| JOOGLE Blue    | #4285f4 | Google blue       |
+| JOOGLE Red     | #ea4335 | Google red        |
+| JOOGLE Yellow  | #fbbc05 | Google yellow     |
+| JOOGLE Green   | #34a853 | Google green      |
 
 ### Typography
 
@@ -162,15 +168,15 @@ chore: maintenance tasks
 
 ## Timeline
 
-| Phase | Estimated Time |
-|-------|----------------|
-| Phase 1: Core UI | 2-3 hours |
-| Phase 2: Search | 2 hours |
-| Phase 3: i18n | 1-2 hours |
-| Phase 4: State | 1 hour |
-| Phase 5: Easter Eggs | 1 hour |
-| Phase 6: Testing | 2 hours |
-| **Total** | **9-11 hours** |
+| Phase                | Estimated Time |
+| -------------------- | -------------- |
+| Phase 1: Core UI     | 2-3 hours      |
+| Phase 2: Search      | 2 hours        |
+| Phase 3: i18n        | 1-2 hours      |
+| Phase 4: State       | 1 hour         |
+| Phase 5: Easter Eggs | 1 hour         |
+| Phase 6: Testing     | 2 hours        |
+| **Total**            | **9-11 hours** |
 
 ## References
 
