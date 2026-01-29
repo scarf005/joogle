@@ -11,6 +11,8 @@
     "test": "deno run -A --node-modules-dir npm:vitest run",
     "test:watch": "deno run -A --node-modules-dir npm:vitest",
     "test:ui": "deno run -A --node-modules-dir npm:vitest --ui",
+    "test:e2e": "deno run -A --node-modules-dir npm:playwright test",
+    "test:e2e:ui": "deno run -A --node-modules-dir npm:playwright test --ui",
     "lingui:extract": "deno run -A --node-modules-dir npm:@lingui/cli extract",
     "lingui:compile": "deno run -A --node-modules-dir npm:@lingui/cli compile"
   },
@@ -35,6 +37,8 @@
     "@testing-library/preact": "npm:@testing-library/preact@^3.2.4",
     "@testing-library/jest-dom": "npm:@testing-library/jest-dom@^6.4.0",
     "jsdom": "npm:jsdom@^24.0.0",
-    "preact/hooks": "npm:preact@^10.28.0/hooks"
+    "preact/hooks": "npm:preact@^10.28.0/hooks",
+    "@playwright/test": "npm:@playwright/test@^1.49.0",
+    "playwright": "npm:playwright@^1.49.0"
   }
 }
