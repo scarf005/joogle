@@ -57,7 +57,8 @@ export function Results({ onNavigateToHome }: ResultsProps) {
   const handleSearch = (query: string) => {
     if (!query.trim()) return
 
-    if (checkEasterEgg(query)) {
+    const easterEgg = checkEasterEgg(query)
+    if (easterEgg === "joogle") {
       onNavigateToHome()
       return
     }

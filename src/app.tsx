@@ -3,6 +3,7 @@ import { signal } from "@preact/signals"
 import { Home } from "./pages/Home/Home.tsx"
 import { Results } from "./pages/Results/Results.tsx"
 import { Footer } from "./components/Footer/Footer.tsx"
+import { EasterEggOverlay } from "./components/EasterEggOverlay/EasterEggOverlay.tsx"
 import { clearQuery } from "./stores/search.ts"
 
 type Page = "home" | "results"
@@ -38,6 +39,7 @@ export function App() {
 
   return (
     <>
+      <EasterEggOverlay />
       {currentPage.value === "home"
         ? (
           <>

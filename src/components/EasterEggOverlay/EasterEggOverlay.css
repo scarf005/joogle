@@ -1,0 +1,138 @@
+.easter-egg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+.easter-egg-overlay__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 48px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 3px solid var(--egg-color, #4285f4);
+  animation: bounceIn 0.5s ease-out;
+}
+
+.easter-egg-overlay__emoji {
+  font-size: 64px;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.easter-egg-overlay__text {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--egg-color, #202124);
+  text-align: center;
+  margin: 0;
+}
+
+.easter-egg-overlay--aru .easter-egg-overlay__content {
+  background: linear-gradient(135deg, #fff 0%, #ffe6e6 100%);
+}
+
+.easter-egg-overlay--hoshino .easter-egg-overlay__content {
+  background: linear-gradient(135deg, #fff 0%, #f3e5f5 100%);
+}
+
+.easter-egg-overlay--shiroko .easter-egg-overlay__content {
+  background: linear-gradient(135deg, #fff 0%, #e3f2fd 100%);
+}
+
+.easter-egg-overlay--hina .easter-egg-overlay__content {
+  background: linear-gradient(135deg, #fff 0%, #eceff1 100%);
+}
+
+.easter-egg-overlay--mika .easter-egg-overlay__content {
+  background: linear-gradient(135deg, #fff 0%, #fce4ec 100%);
+}
+
+.easter-egg-overlay--mika .easter-egg-overlay__emoji {
+  animation: heartBeat 1s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.3);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.3);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .easter-egg-overlay__content {
+    padding: 24px 32px;
+    margin: 16px;
+  }
+
+  .easter-egg-overlay__emoji {
+    font-size: 48px;
+  }
+
+  .easter-egg-overlay__text {
+    font-size: 18px;
+  }
+}
