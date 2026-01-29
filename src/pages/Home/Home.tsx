@@ -5,15 +5,21 @@ import { SearchButtons } from "../../components/SearchButton/SearchButton.tsx"
 import { LanguageSwitch } from "../../components/LanguageSwitch/LanguageSwitch.tsx"
 import { searchQuery, setLoading, setResults } from "../../stores/search.ts"
 import { checkEasterEgg, joogleMode } from "../../stores/easter.ts"
-import { locale } from "../../stores/locale.ts"
+import { type Locale, locale } from "../../stores/locale.ts"
 import { getRandomCharacter, performSearch } from "../../services/search.ts"
 
 interface HomeProps {
   onNavigateToResults: () => void
 }
 
+const subtitles: Record<Locale, string> = {
+  ko: "블루 아카이브 전용 검색 엔진",
+  en: "Blue Archive Search Engine",
+  ja: "ブルーアーカイブ専用検索エンジン",
+}
+
 export function Home({ onNavigateToResults }: HomeProps) {
-  const handleSearch = async (query: string) => {
+  const handleSearch = (query: string) => {
     if (!query.trim()) return
 
     if (checkEasterEgg(query)) {
@@ -21,7 +27,7 @@ export function Home({ onNavigateToResults }: HomeProps) {
     }
 
     setLoading(true)
-    const results = await performSearch(query)
+    const results = performSearch(query)
     setResults(results)
     setLoading(false)
     onNavigateToResults()
@@ -29,14 +35,15 @@ export function Home({ onNavigateToResults }: HomeProps) {
 
   const handleLucky = () => {
     const character = getRandomCharacter()
-    const currentLocale = locale.value as "ko" | "ja"
-    const name = character.name[currentLocale] || character.name.ko
-    window.open(`https://namu.wiki/w/${encodeURIComponent(name)}`, "_blank")
+    const currentLocale = locale.value as Locale
+    const name = character.name[currentLocale] || character.name.en
+    const wikiUrl = currentLocale === "en"
+      ? `https://bluearchive.wiki/wiki/${encodeURIComponent(name)}`
+      : `https://namu.wiki/w/${encodeURIComponent(character.name.ko)}`
+    globalThis.open(wikiUrl, "_blank")
   }
 
-  const subtitle = locale.value === "ko"
-    ? "블루 아카이브 전용 검색 엔진"
-    : "ブルーアーカイブ専用検索エンジン"
+  const currentLocale = locale.value as Locale
 
   return (
     <main class="home">
@@ -51,7 +58,7 @@ export function Home({ onNavigateToResults }: HomeProps) {
         />
         <LanguageSwitch />
         <p class="home__subtitle">
-          {subtitle} -{" "}
+          {subtitles[currentLocale]} -{" "}
           <a href="https://bluearchive.wiki" target="_blank" rel="noopener">
             Blue Archive Wiki
           </a>

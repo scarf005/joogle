@@ -1,24 +1,26 @@
 import "./SearchButton.css"
-import { locale } from "../../stores/locale.ts"
+import { type Locale, locale } from "../../stores/locale.ts"
 
 interface SearchButtonProps {
   variant: "primary" | "lucky"
   onClick: () => void
 }
 
-const labels = {
+const labels: Record<string, Record<Locale, string>> = {
   primary: {
     ko: "Joogle 검색",
+    en: "Joogle Search",
     ja: "Joogle 検索",
   },
   lucky: {
     ko: "I'm Feeling Lucky",
+    en: "I'm Feeling Lucky",
     ja: "I'm Feeling Lucky",
   },
 }
 
 export function SearchButton({ variant, onClick }: SearchButtonProps) {
-  const currentLocale = locale.value as "ko" | "ja"
+  const currentLocale = locale.value as Locale
   const label = labels[variant][currentLocale]
   const className = `search-button search-button--${variant}`
 

@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest"
 import {
+  isEnglish,
   isJapanese,
   isKorean,
   locale,
+  nextLocale,
   setLocale,
-  toggleLocale,
 } from "./locale.ts"
 
 describe("Locale Store", () => {
@@ -22,15 +23,21 @@ describe("Locale Store", () => {
 
     setLocale("ko")
     expect(locale.value).toBe("ko")
+
+    setLocale("en")
+    expect(locale.value).toBe("en")
   })
 
-  it("toggleLocale should switch between languages", () => {
+  it("nextLocale should cycle through ko → en → ja → ko", () => {
     expect(locale.value).toBe("ko")
 
-    toggleLocale()
+    nextLocale()
+    expect(locale.value).toBe("en")
+
+    nextLocale()
     expect(locale.value).toBe("ja")
 
-    toggleLocale()
+    nextLocale()
     expect(locale.value).toBe("ko")
   })
 
@@ -38,11 +45,20 @@ describe("Locale Store", () => {
     locale.value = "ko"
     expect(isKorean.value).toBe(true)
     expect(isJapanese.value).toBe(false)
+    expect(isEnglish.value).toBe(false)
   })
 
   it("isJapanese should be true when locale is ja", () => {
     locale.value = "ja"
     expect(isKorean.value).toBe(false)
     expect(isJapanese.value).toBe(true)
+    expect(isEnglish.value).toBe(false)
+  })
+
+  it("isEnglish should be true when locale is en", () => {
+    locale.value = "en"
+    expect(isKorean.value).toBe(false)
+    expect(isJapanese.value).toBe(false)
+    expect(isEnglish.value).toBe(true)
   })
 })

@@ -12,18 +12,18 @@ const currentPage = signal<Page>("home")
 export function App() {
   const navigateToResults = () => {
     currentPage.value = "results"
-    window.history.pushState({}, "", "#/search")
+    globalThis.history.pushState({}, "", "#/search")
   }
 
   const navigateToHome = () => {
     currentPage.value = "home"
     clearQuery()
-    window.history.pushState({}, "", "#/")
+    globalThis.history.pushState({}, "", "#/")
   }
 
-  if (typeof window !== "undefined") {
-    window.addEventListener("popstate", () => {
-      if (window.location.hash === "#/search") {
+  if (typeof globalThis !== "undefined" && globalThis.location) {
+    globalThis.addEventListener("popstate", () => {
+      if (globalThis.location.hash === "#/search") {
         currentPage.value = "results"
       } else {
         currentPage.value = "home"
@@ -31,7 +31,7 @@ export function App() {
       }
     })
 
-    if (window.location.hash === "#/search") {
+    if (globalThis.location.hash === "#/search") {
       currentPage.value = "results"
     }
   }

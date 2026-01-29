@@ -70,46 +70,46 @@ joogle/
 
 ## Features
 
-### Phase 1: Core UI (Priority: High)
+### Phase 1: Core UI (Priority: High) ✅
 
-- [ ] Google-identical homepage layout
-- [ ] JOOGLE logo with Blue Archive theme
-- [ ] Search bar with focus states
-- [ ] "Joogle 검색" / "I'm Feeling Lucky" buttons
-- [ ] Responsive design
+- [x] Google-identical homepage layout
+- [x] JOOGLE logo with Blue Archive theme
+- [x] Search bar with focus states
+- [x] "Joogle 검색" / "I'm Feeling Lucky" buttons
+- [x] Responsive design
 
-### Phase 2: Search Functionality (Priority: High)
+### Phase 2: Search Functionality (Priority: High) ✅
 
-- [ ] Search query handling
-- [ ] Autocomplete suggestions (BA characters, terms)
-- [ ] Search results page
-- [ ] Integration with Blue Archive wikis/resources
+- [x] Search query handling
+- [x] Autocomplete suggestions (BA characters, terms)
+- [x] Search results page
+- [x] Integration with Blue Archive wikis/resources
 
-### Phase 3: Internationalization (Priority: Medium)
+### Phase 3: Internationalization (Priority: Medium) ✅
 
-- [ ] Lingui setup with Vite
-- [ ] Korean translations (default)
-- [ ] Japanese translations
-- [ ] Language switcher UI
+- [x] Lingui setup with Vite
+- [x] Korean translations (default)
+- [x] Japanese translations
+- [x] Language switcher UI
 
-### Phase 4: State Management (Priority: High)
+### Phase 4: State Management (Priority: High) ✅
 
-- [ ] Preact Signals setup
-- [ ] Search state (query, results, loading)
-- [ ] Locale state
-- [ ] Preferences state
+- [x] Preact Signals setup
+- [x] Search state (query, results, loading)
+- [x] Locale state
+- [x] Preferences state
 
-### Phase 5: Easter Eggs (Priority: Medium)
+### Phase 5: Easter Eggs (Priority: Medium) ✅
 
-- [ ] "joogle" search easter egg
+- [x] "joogle" search easter egg
 - [ ] Character-specific interactions
 - [ ] Hidden features for community
 
-### Phase 6: Testing (Priority: High)
+### Phase 6: Testing (Priority: High) ✅
 
-- [ ] Vitest setup
-- [ ] Unit tests for components
-- [ ] Integration tests
+- [x] Vitest setup
+- [x] Unit tests for components
+- [x] Integration tests
 - [ ] E2E tests consideration
 
 ## Design Specifications

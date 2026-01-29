@@ -4,22 +4,57 @@ import { SearchBar } from "../../components/SearchBar/SearchBar.tsx"
 import { Footer } from "../../components/Footer/Footer.tsx"
 import {
   isLoading,
-  searchQuery,
   type SearchResult,
   searchResults,
   setLoading,
   setResults,
 } from "../../stores/search.ts"
 import { checkEasterEgg } from "../../stores/easter.ts"
-import { locale } from "../../stores/locale.ts"
+import { type Locale, locale } from "../../stores/locale.ts"
 import { performSearch } from "../../services/search.ts"
 
 interface ResultsProps {
   onNavigateToHome: () => void
 }
 
+const statsTexts: Record<Locale, (count: number) => string> = {
+  ko: (count) => `검색결과 약 ${count}개`,
+  en: (count) => `About ${count} results`,
+  ja: (count) => `約${count}件の検索結果`,
+}
+
+const loadingTexts: Record<Locale, string> = {
+  ko: "검색 중...",
+  en: "Searching...",
+  ja: "検索中...",
+}
+
+const typeLabelsMap: Record<Locale, Record<string, string>> = {
+  ko: {
+    character: "캐릭터",
+    school: "학교",
+    guide: "가이드",
+    event: "이벤트",
+    wiki: "위키",
+  },
+  en: {
+    character: "Character",
+    school: "School",
+    guide: "Guide",
+    event: "Event",
+    wiki: "Wiki",
+  },
+  ja: {
+    character: "キャラクター",
+    school: "学校",
+    guide: "ガイド",
+    event: "イベント",
+    wiki: "ウィキ",
+  },
+}
+
 export function Results({ onNavigateToHome }: ResultsProps) {
-  const handleSearch = async (query: string) => {
+  const handleSearch = (query: string) => {
     if (!query.trim()) return
 
     if (checkEasterEgg(query)) {
@@ -28,7 +63,7 @@ export function Results({ onNavigateToHome }: ResultsProps) {
     }
 
     setLoading(true)
-    const results = await performSearch(query)
+    const results = performSearch(query)
     setResults(results)
     setLoading(false)
   }
@@ -37,10 +72,9 @@ export function Results({ onNavigateToHome }: ResultsProps) {
     onNavigateToHome()
   }
 
+  const currentLocale = locale.value as Locale
   const resultCount = searchResults.value.length
-  const statsText = locale.value === "ko"
-    ? `검색결과 약 ${resultCount}개`
-    : `約${resultCount}件の検索結果`
+  const statsText = statsTexts[currentLocale](resultCount)
 
   return (
     <div class="results">
@@ -61,7 +95,7 @@ export function Results({ onNavigateToHome }: ResultsProps) {
         {isLoading.value
           ? (
             <div class="results__loading">
-              {locale.value === "ko" ? "검색 중..." : "検索中..."}
+              {loadingTexts[currentLocale]}
             </div>
           )
           : (
@@ -86,13 +120,8 @@ interface SearchResultItemProps {
 }
 
 function SearchResultItem({ result }: SearchResultItemProps) {
-  const typeLabels = {
-    character: locale.value === "ko" ? "캐릭터" : "キャラクター",
-    school: locale.value === "ko" ? "학교" : "学校",
-    guide: locale.value === "ko" ? "가이드" : "ガイド",
-    event: locale.value === "ko" ? "이벤트" : "イベント",
-    wiki: locale.value === "ko" ? "위키" : "ウィキ",
-  }
+  const currentLocale = locale.value as Locale
+  const typeLabels = typeLabelsMap[currentLocale]
 
   return (
     <article class="result-item">

@@ -1,7 +1,7 @@
 import "./Footer.css"
-import { locale } from "../../stores/locale.ts"
+import { type Locale, locale } from "../../stores/locale.ts"
 
-const footerLinks = {
+const footerLinks: Record<Locale, Record<string, string>> = {
   ko: {
     location: "대한민국",
     about: "JOOGLE 소개",
@@ -10,6 +10,15 @@ const footerLinks = {
     privacy: "개인정보처리방침",
     terms: "약관",
     settings: "설정",
+  },
+  en: {
+    location: "Global",
+    about: "About JOOGLE",
+    advertising: "Advertising",
+    business: "Business",
+    privacy: "Privacy",
+    terms: "Terms",
+    settings: "Settings",
   },
   ja: {
     location: "日本",
@@ -23,7 +32,7 @@ const footerLinks = {
 }
 
 export function Footer() {
-  const currentLocale = locale.value as "ko" | "ja"
+  const currentLocale = locale.value as Locale
   const links = footerLinks[currentLocale]
 
   return (

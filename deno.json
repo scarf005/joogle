@@ -1,6 +1,7 @@
 {
   "fmt": {
-    "semiColons": false
+    "semiColons": false,
+    "exclude": ["iochi_mari.html"]
   },
   "tasks": {
     "dev": "deno run -A --node-modules-dir npm:vite",
