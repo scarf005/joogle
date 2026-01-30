@@ -1,8 +1,12 @@
 import { type SearchResult } from "../stores/search.ts"
 import { type Character, characters, schools } from "../data/blueArchive.ts"
 import { type Locale, locale } from "../stores/locale.ts"
+import { type Filters } from "../stores/filters.ts"
 
-export function performSearch(query: string): SearchResult[] {
+export function performSearch(
+  query: string,
+  filters?: Filters,
+): SearchResult[] {
   const normalizedQuery = query.toLowerCase().trim()
   const currentLocale = locale.value as Locale
   const results: SearchResult[] = []
@@ -12,11 +16,20 @@ export function performSearch(query: string): SearchResult[] {
     const nameJa = char.name.ja.toLowerCase()
     const nameEn = char.name.en.toLowerCase()
 
-    if (
-      nameKo.includes(normalizedQuery) ||
+    const matchesQuery = nameKo.includes(normalizedQuery) ||
       nameJa.includes(normalizedQuery) ||
       nameEn.includes(normalizedQuery)
-    ) {
+
+    const matchesFilters = !filters ||
+      (
+        (filters.schools.length === 0 ||
+          filters.schools.includes(char.school)) &&
+        (filters.roles.length === 0 || filters.roles.includes(char.role)) &&
+        (filters.rarities.length === 0 ||
+          filters.rarities.includes(char.rarity))
+      )
+
+    if (matchesQuery && matchesFilters) {
       const displayName = char.name[currentLocale] || char.name.en
       const url = currentLocale === "en"
         ? `https://bluearchive.wiki/wiki/${encodeURIComponent(char.name.en)}`

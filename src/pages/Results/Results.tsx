@@ -1,10 +1,13 @@
 import "./Results.css"
+import { useEffect } from "preact/hooks"
 import { Logo } from "../../components/Logo/Logo.tsx"
 import { SearchBar } from "../../components/SearchBar/SearchBar.tsx"
 import { Footer } from "../../components/Footer/Footer.tsx"
 import { ThemeToggle } from "../../components/ThemeToggle/ThemeToggle.tsx"
+import { SearchFilters } from "../../components/SearchFilters/SearchFilters.tsx"
 import {
   isLoading,
+  searchQuery,
   type SearchResult,
   searchResults,
   setLoading,
@@ -13,6 +16,7 @@ import {
 import { checkEasterEgg } from "../../stores/easter.ts"
 import { addToHistory } from "../../stores/history.ts"
 import { type Locale, locale } from "../../stores/locale.ts"
+import { activeFilters } from "../../stores/filters.ts"
 import { performSearch } from "../../services/search.ts"
 
 interface ResultsProps {
@@ -67,10 +71,17 @@ export function Results({ onNavigateToHome }: ResultsProps) {
 
     addToHistory(query)
     setLoading(true)
-    const results = performSearch(query)
+    const results = performSearch(query, activeFilters.value)
     setResults(results)
     setLoading(false)
   }
+
+  useEffect(() => {
+    if (searchQuery.value) {
+      const results = performSearch(searchQuery.value, activeFilters.value)
+      setResults(results)
+    }
+  }, [activeFilters.value])
 
   const handleLogoClick = () => {
     onNavigateToHome()
@@ -108,10 +119,15 @@ export function Results({ onNavigateToHome }: ResultsProps) {
           : (
             <>
               <div class="results__stats">{statsText}</div>
-              <div class="results__list">
-                {searchResults.value.map((result: SearchResult) => (
-                  <SearchResultItem key={result.id} result={result} />
-                ))}
+              <div class="results__layout">
+                <div class="results__sidebar">
+                  <SearchFilters />
+                </div>
+                <div class="results__list">
+                  {searchResults.value.map((result: SearchResult) => (
+                    <SearchResultItem key={result.id} result={result} />
+                  ))}
+                </div>
               </div>
             </>
           )}
