@@ -7,4 +7,5 @@ export default defineConfig({
     deno(),
     preact(),
   ],
+  base: Deno.env.get("GITHUB_ACTIONS") ? "/joogle/" : "/",
 })

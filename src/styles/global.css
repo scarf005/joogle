@@ -7,16 +7,39 @@
   --color-bg-hover: #f1f3f4;
   --color-border: #dfe1e5;
   --color-border-focus: #4285f4;
+  --color-shadow: rgba(0, 0, 0, 0.1);
 
   --color-joogle-blue: #4285f4;
   --color-joogle-red: #ea4335;
   --color-joogle-yellow: #fbbc05;
   --color-joogle-green: #34a853;
 
+  --color-tag-character-bg: #e8f0fe;
+  --color-tag-character-text: #1a73e8;
+  --color-tag-school-bg: #fce8e6;
+  --color-tag-school-text: #d93025;
+
   --font-family: Arial, sans-serif;
   --search-bar-width: 582px;
   --search-bar-height: 44px;
   --logo-width: 272px;
+}
+
+[data-theme="dark"] {
+  --color-text-primary: #e8eaed;
+  --color-text-secondary: #9aa0a6;
+  --color-text-link: #8ab4f8;
+  --color-bg-primary: #202124;
+  --color-bg-secondary: #303134;
+  --color-bg-hover: #3c4043;
+  --color-border: #5f6368;
+  --color-border-focus: #8ab4f8;
+  --color-shadow: rgba(0, 0, 0, 0.3);
+
+  --color-tag-character-bg: #1a3a5c;
+  --color-tag-character-text: #8ab4f8;
+  --color-tag-school-bg: #5c2a2a;
+  --color-tag-school-text: #f28b82;
 }
 
 * {

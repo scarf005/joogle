@@ -65,7 +65,10 @@ export function performSearch(query: string): SearchResult[] {
   })
 
   if (results.length === 0) {
-    const fallbackTexts: Record<Locale, { wiki: string; wikiDesc: string; baWiki: string; baWikiDesc: string }> = {
+    const fallbackTexts: Record<
+      Locale,
+      { wiki: string; wikiDesc: string; baWiki: string; baWikiDesc: string }
+    > = {
       ko: {
         wiki: `"${query}" - 나무위키 검색`,
         wikiDesc: "나무위키에서 더 많은 결과를 찾아보세요",
@@ -124,7 +127,10 @@ export function performSearch(query: string): SearchResult[] {
   return results
 }
 
-function getCharacterDescription(char: Character, currentLocale: Locale): string {
+function getCharacterDescription(
+  char: Character,
+  currentLocale: Locale,
+): string {
   const school = schools.find((s) => s.id === char.school)
   const schoolName = school
     ? (school.name[currentLocale] || school.name.en)

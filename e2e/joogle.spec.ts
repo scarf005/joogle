@@ -69,9 +69,7 @@ test.describe("Search Functionality", () => {
     await expect(suggestions).toBeVisible()
   })
 
-  test("should return to home when clicking logo on results page", async ({
-    page,
-  }) => {
+  test("should return to home when clicking logo on results page", async ({ page }) => {
     await page.goto("/")
     const searchInput = page.locator('input[type="text"]')
 

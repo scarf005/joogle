@@ -3,6 +3,7 @@ import { Logo } from "../../components/Logo/Logo.tsx"
 import { SearchBar } from "../../components/SearchBar/SearchBar.tsx"
 import { SearchButtons } from "../../components/SearchButton/SearchButton.tsx"
 import { LanguageSwitch } from "../../components/LanguageSwitch/LanguageSwitch.tsx"
+import { ThemeToggle } from "../../components/ThemeToggle/ThemeToggle.tsx"
 import { searchQuery, setLoading, setResults } from "../../stores/search.ts"
 import { checkEasterEgg, joogleMode } from "../../stores/easter.ts"
 import { type Locale, locale } from "../../stores/locale.ts"
@@ -57,7 +58,10 @@ export function Home({ onNavigateToResults }: HomeProps) {
           onSearch={() => handleSearch(searchQuery.value)}
           onLucky={handleLucky}
         />
-        <LanguageSwitch />
+        <div class="home__controls">
+          <LanguageSwitch />
+          <ThemeToggle />
+        </div>
         <p class="home__subtitle">
           {subtitles[currentLocale]} -{" "}
           <a href="https://bluearchive.wiki" target="_blank" rel="noopener">

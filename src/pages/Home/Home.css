@@ -27,6 +27,14 @@
   color: var(--color-text-link);
 }
 
+.home__controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 @media (max-width: 768px) {
   .home {
     padding-top: 10vh;

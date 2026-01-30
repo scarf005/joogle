@@ -17,13 +17,13 @@
 }
 
 .search-bar__wrapper:hover {
-  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-  border-color: rgba(223, 225, 229, 0);
+  box-shadow: 0 1px 6px var(--color-shadow);
+  border-color: transparent;
 }
 
 .search-bar__wrapper:focus-within {
-  box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-  border-color: rgba(223, 225, 229, 0);
+  box-shadow: 0 1px 6px var(--color-shadow);
+  border-color: transparent;
 }
 
 .search-bar__icon {
@@ -33,7 +33,7 @@
   width: 20px;
   height: 20px;
   margin-right: 13px;
-  color: #9aa0a6;
+  color: var(--color-text-secondary);
 }
 
 .search-bar__icon svg {
@@ -85,7 +85,7 @@
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(32, 33, 36, 0.28);
+  box-shadow: 0 4px 6px var(--color-shadow);
   z-index: 100;
   max-height: 300px;
   overflow-y: auto;

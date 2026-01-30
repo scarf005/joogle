@@ -2,6 +2,7 @@ import "./Results.css"
 import { Logo } from "../../components/Logo/Logo.tsx"
 import { SearchBar } from "../../components/SearchBar/SearchBar.tsx"
 import { Footer } from "../../components/Footer/Footer.tsx"
+import { ThemeToggle } from "../../components/ThemeToggle/ThemeToggle.tsx"
 import {
   isLoading,
   type SearchResult,
@@ -89,6 +90,9 @@ export function Results({ onNavigateToHome }: ResultsProps) {
         </div>
         <div class="results__search">
           <SearchBar onSearch={handleSearch} />
+        </div>
+        <div class="results__actions">
+          <ThemeToggle />
         </div>
       </header>
 
