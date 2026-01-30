@@ -1,14 +1,17 @@
 import "./SearchBar.css"
+import { useRef } from "preact/hooks"
 import { searchQuery, setQuery, showSuggestions } from "../../stores/search.ts"
 import { locale } from "../../stores/locale.ts"
 import { searchHistory } from "../../stores/history.ts"
 import { characters, searchTerms } from "../../data/blueArchive.ts"
 import { computed } from "@preact/signals"
+import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts.ts"
 
 interface SearchBarProps {
   onSearch: (query: string) => void
   autoFocus?: boolean
   placeholder?: string
+  enableShortcuts?: boolean
 }
 
 const suggestions = computed(() => {
@@ -42,10 +45,16 @@ const suggestions = computed(() => {
 })
 
 export function SearchBar(
-  { onSearch, autoFocus = false, placeholder }: SearchBarProps,
+  { onSearch, autoFocus = false, placeholder, enableShortcuts = false }:
+    SearchBarProps,
 ) {
+  const inputRef = useRef<HTMLInputElement>(null)
   const currentPlaceholder = placeholder ||
     (locale.value === "ko" ? "블루 아카이브 검색" : "ブルーアーカイブを検索")
+
+  if (enableShortcuts) {
+    useKeyboardShortcuts(inputRef)
+  }
 
   const handleInput = (e: Event) => {
     const value = (e.target as HTMLInputElement).value
@@ -103,6 +112,7 @@ export function SearchBar(
           </svg>
         </div>
         <input
+          ref={inputRef}
           type="text"
           class="search-bar__input"
           value={searchQuery.value}

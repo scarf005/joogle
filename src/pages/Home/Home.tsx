@@ -55,7 +55,7 @@ export function Home({ onNavigateToResults }: HomeProps) {
         <Logo size="large" animated={joogleMode.value} />
       </div>
       <div class="home__search">
-        <SearchBar onSearch={handleSearch} autoFocus />
+        <SearchBar onSearch={handleSearch} autoFocus enableShortcuts />
         <SearchButtons
           onSearch={() => handleSearch(searchQuery.value)}
           onLucky={handleLucky}

@@ -91,7 +91,7 @@ export function Results({ onNavigateToHome }: ResultsProps) {
           <Logo size="small" />
         </div>
         <div class="results__search">
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} enableShortcuts />
         </div>
         <div class="results__actions">
           <ThemeToggle />
