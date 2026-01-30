@@ -11,6 +11,7 @@ import {
   setResults,
 } from "../../stores/search.ts"
 import { checkEasterEgg } from "../../stores/easter.ts"
+import { addToHistory } from "../../stores/history.ts"
 import { type Locale, locale } from "../../stores/locale.ts"
 import { performSearch } from "../../services/search.ts"
 
@@ -64,6 +65,7 @@ export function Results({ onNavigateToHome }: ResultsProps) {
       return
     }
 
+    addToHistory(query)
     setLoading(true)
     const results = performSearch(query)
     setResults(results)

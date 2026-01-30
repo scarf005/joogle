@@ -6,6 +6,7 @@ import { LanguageSwitch } from "../../components/LanguageSwitch/LanguageSwitch.t
 import { ThemeToggle } from "../../components/ThemeToggle/ThemeToggle.tsx"
 import { searchQuery, setLoading, setResults } from "../../stores/search.ts"
 import { checkEasterEgg, joogleMode } from "../../stores/easter.ts"
+import { addToHistory } from "../../stores/history.ts"
 import { type Locale, locale } from "../../stores/locale.ts"
 import { getRandomCharacter, performSearch } from "../../services/search.ts"
 
@@ -28,6 +29,7 @@ export function Home({ onNavigateToResults }: HomeProps) {
       return
     }
 
+    addToHistory(query)
     setLoading(true)
     const results = performSearch(query)
     setResults(results)
