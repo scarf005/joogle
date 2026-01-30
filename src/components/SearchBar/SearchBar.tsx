@@ -6,6 +6,7 @@ import { searchHistory } from "../../stores/history.ts"
 import { characters, searchTerms } from "../../data/blueArchive.ts"
 import { computed } from "@preact/signals"
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts.ts"
+import { VoiceSearch } from "../VoiceSearch/VoiceSearch.tsx"
 
 interface SearchBarProps {
   onSearch: (query: string) => void
@@ -147,6 +148,14 @@ export function SearchBar(
             />
           </svg>
         </button>
+        <VoiceSearch
+          onResult={(transcript) => {
+            setQuery(transcript)
+            showSuggestions.value = false
+            onSearch(transcript)
+          }}
+          locale={locale.value}
+        />
       </div>
       {showSuggestions.value && suggestions.value.length > 0 && (
         <div class="search-bar__suggestions" role="listbox">
