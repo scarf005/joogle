@@ -12,9 +12,7 @@
     "test:watch": "deno run -A --node-modules-dir npm:vitest",
     "test:ui": "deno run -A --node-modules-dir npm:vitest --ui",
     "test:e2e": "deno run -A --node-modules-dir npm:playwright test",
-    "test:e2e:ui": "deno run -A --node-modules-dir npm:playwright test --ui",
-    "lingui:extract": "deno run -A --node-modules-dir npm:@lingui/cli extract",
-    "lingui:compile": "deno run -A --node-modules-dir npm:@lingui/cli compile"
+    "test:e2e:ui": "deno run -A --node-modules-dir npm:playwright test --ui"
   },
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
@@ -25,17 +23,10 @@
     "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.5",
     "@preact/preset-vite": "npm:@preact/preset-vite@^2.10.2",
     "@preact/signals": "npm:@preact/signals@^1.3.0",
-    "@lingui/core": "npm:@lingui/core@^4.11.0",
-    "@lingui/react": "npm:@lingui/react@^4.11.0",
-    "@lingui/vite-plugin": "npm:@lingui/vite-plugin@^4.11.0",
-    "@lingui/cli": "npm:@lingui/cli@^4.11.0",
-    "@lingui/macro": "npm:@lingui/macro@^4.11.0",
     "preact": "npm:preact@^10.28.0",
     "vite": "npm:vite@^7.2.7",
     "vitest": "npm:vitest@^2.0.0",
     "vitest/config": "npm:vitest@^2.0.0/config",
-    "@testing-library/preact": "npm:@testing-library/preact@^3.2.4",
-    "@testing-library/jest-dom": "npm:@testing-library/jest-dom@^6.4.0",
     "jsdom": "npm:jsdom@^24.0.0",
     "preact/hooks": "npm:preact@^10.28.0/hooks",
     "@playwright/test": "npm:@playwright/test@^1.49.0",
