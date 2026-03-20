@@ -1,0 +1,69 @@
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+}
+
+.logo__text {
+  font-size: 92px;
+  font-weight: 400;
+  letter-spacing: -4px;
+  display: flex;
+}
+
+.logo__text--small {
+  font-size: 30px;
+  letter-spacing: -1px;
+}
+
+.logo__letter {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.logo__letter:hover {
+  transform: scale(1.1);
+}
+
+.logo__letter--j {
+  color: var(--color-joogle-blue);
+}
+.logo__letter--o1 {
+  color: var(--color-joogle-red);
+}
+.logo__letter--o2 {
+  color: var(--color-joogle-yellow);
+}
+.logo__letter--g {
+  color: var(--color-joogle-blue);
+}
+.logo__letter--l {
+  color: var(--color-joogle-green);
+}
+.logo__letter--e {
+  color: var(--color-joogle-red);
+}
+
+.logo--animated .logo__letter {
+  animation: joogle-bounce 0.5s ease-in-out;
+}
+
+.logo--animated .logo__letter:nth-child(1) {
+  animation-delay: 0s;
+}
+.logo--animated .logo__letter:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.logo--animated .logo__letter:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.logo--animated .logo__letter:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.logo--animated .logo__letter:nth-child(5) {
+  animation-delay: 0.4s;
+}
+.logo--animated .logo__letter:nth-child(6) {
+  animation-delay: 0.5s;
+}
