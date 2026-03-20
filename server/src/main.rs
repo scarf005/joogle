@@ -73,6 +73,19 @@ struct ClickResponse {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CountryLeaderboardEntry {
+    country_code: String,
+    total: u64,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct LeaderboardResponse {
+    entries: Vec<CountryLeaderboardEntry>,
+}
+
+#[derive(Debug, Serialize)]
 struct ErrorResponse {
     error: &'static str,
 }
@@ -104,6 +117,26 @@ impl ClickStore {
                 .unwrap_or_default(),
             global_total: self.global_total,
         }
+    }
+
+    fn leaderboard(&self) -> LeaderboardResponse {
+        let mut entries = self
+            .per_country
+            .iter()
+            .map(|(country_code, total)| CountryLeaderboardEntry {
+                country_code: country_code.clone(),
+                total: *total,
+            })
+            .collect::<Vec<_>>();
+
+        entries.sort_by(|left, right| {
+            right
+                .total
+                .cmp(&left.total)
+                .then_with(|| left.country_code.cmp(&right.country_code))
+        });
+
+        LeaderboardResponse { entries }
     }
 }
 
@@ -179,6 +212,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/api/jjugeul", get(get_clicks).post(post_clicks))
+        .route("/api/jjugeul/leaderboard", get(get_leaderboard))
         .fallback_service(
             ServeDir::new(frontend_dist_dir())
                 .not_found_service(ServeFile::new(frontend_dist_dir().join("index.html"))),
@@ -264,6 +298,10 @@ async fn post_clicks(
     state.dirty.store(true, Ordering::Relaxed);
 
     (StatusCode::ACCEPTED, Json(response)).into_response()
+}
+
+async fn get_leaderboard(State(state): State<AppState>) -> impl IntoResponse {
+    Json(state.store.read().await.leaderboard())
 }
 
 fn spawn_persist_loop(state: AppState) {
@@ -385,6 +423,20 @@ mod tests {
         assert_eq!(response.country_total, 3);
         assert_eq!(response.global_total, 3);
         assert_eq!(store.snapshot("KR").country_total, 3);
+    }
+
+    #[test]
+    fn leaderboard_is_sorted_by_total_descending() {
+        let mut store = ClickStore::default();
+        store.apply_delta("JP", 2);
+        store.apply_delta("KR", 5);
+        store.apply_delta("US", 3);
+
+        let leaderboard = store.leaderboard();
+
+        assert_eq!(leaderboard.entries[0].country_code, "KR");
+        assert_eq!(leaderboard.entries[1].country_code, "US");
+        assert_eq!(leaderboard.entries[2].country_code, "JP");
     }
 
     #[test]
