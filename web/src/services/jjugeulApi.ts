@@ -4,6 +4,15 @@ export interface JjugeulTotals {
   globalTotal: number
 }
 
+export interface JjugeulLeaderboardEntry {
+  countryCode: string
+  total: number
+}
+
+export interface JjugeulLeaderboardResponse {
+  entries: JjugeulLeaderboardEntry[]
+}
+
 interface ClickPayload {
   delta: number
 }
@@ -23,6 +32,16 @@ async function requestJjugeul(
 
 export function fetchJjugeulTotals() {
   return requestJjugeul("/api/jjugeul")
+}
+
+export async function fetchJjugeulLeaderboard() {
+  const response = await fetch("/api/jjugeul/leaderboard")
+
+  if (!response.ok) {
+    throw new Error(`jjugeul leaderboard failed: ${response.status}`)
+  }
+
+  return await response.json() as JjugeulLeaderboardResponse
 }
 
 export function postJjugeulClicks(delta: number) {

@@ -1,47 +1,43 @@
 import { beforeEach, describe, expect, it } from "vitest"
 import {
   consumeJjugeulPendingDelta,
-  jjugeulBestCount,
   jjugeulBurstSeed,
   jjugeulCount,
   jjugeulCountryCode,
   jjugeulCountryTotal,
   jjugeulGlobalTotal,
-  jjugeulMuted,
+  jjugeulLeaderboard,
+  jjugeulLeaderboardOpen,
   jjugeulPendingDelta,
   jjugeulPressed,
   pressJjugeul,
-  rehydrateJjugeulState,
   releaseJjugeul,
   resetJjugeulSession,
   restoreJjugeulPendingDelta,
+  setJjugeulLeaderboard,
   setJjugeulRemoteTotals,
-  toggleJjugeulMuted,
+  toggleJjugeulLeaderboard,
 } from "./jjugeul.ts"
 
 describe("jjugeul store", () => {
   beforeEach(() => {
-    localStorage.clear()
     resetJjugeulSession()
-    jjugeulBestCount.value = 0
     jjugeulCountryCode.value = "ZZ"
     jjugeulCountryTotal.value = 0
     jjugeulGlobalTotal.value = 0
-    jjugeulMuted.value = false
+    jjugeulLeaderboard.value = []
+    jjugeulLeaderboardOpen.value = false
     jjugeulPendingDelta.value = 0
     releaseJjugeul()
-    rehydrateJjugeulState()
   })
 
-  it("increments count and best count on press", () => {
+  it("increments count on press", () => {
     expect(pressJjugeul()).toBe(true)
 
     expect(jjugeulPressed.value).toBe(true)
     expect(jjugeulCount.value).toBe(1)
-    expect(jjugeulBestCount.value).toBe(1)
     expect(jjugeulBurstSeed.value).toBe(1)
     expect(jjugeulPendingDelta.value).toBe(1)
-    expect(localStorage.getItem("jjugeul-best-count")).toBe("1")
   })
 
   it("ignores repeated press until release", () => {
@@ -53,23 +49,6 @@ describe("jjugeul store", () => {
     releaseJjugeul()
     expect(pressJjugeul()).toBe(true)
     expect(jjugeulCount.value).toBe(2)
-  })
-
-  it("rehydrates best count and muted state from storage", () => {
-    localStorage.setItem("jjugeul-best-count", "27")
-    localStorage.setItem("jjugeul-muted", "true")
-
-    rehydrateJjugeulState()
-
-    expect(jjugeulBestCount.value).toBe(27)
-    expect(jjugeulMuted.value).toBe(true)
-  })
-
-  it("persists muted state when toggled", () => {
-    toggleJjugeulMuted()
-
-    expect(jjugeulMuted.value).toBe(true)
-    expect(localStorage.getItem("jjugeul-muted")).toBe("true")
   })
 
   it("consumes and restores pending click deltas", () => {
@@ -93,5 +72,18 @@ describe("jjugeul store", () => {
     expect(jjugeulCountryCode.value).toBe("KR")
     expect(jjugeulCountryTotal.value).toBe(12)
     expect(jjugeulGlobalTotal.value).toBe(99)
+  })
+
+  it("stores leaderboard entries and toggles the panel", () => {
+    setJjugeulLeaderboard([
+      { countryCode: "KR", total: 20 },
+      { countryCode: "JP", total: 15 },
+    ])
+
+    toggleJjugeulLeaderboard()
+
+    expect(jjugeulLeaderboard.value).toHaveLength(2)
+    expect(jjugeulLeaderboard.value[0].countryCode).toBe("KR")
+    expect(jjugeulLeaderboardOpen.value).toBe(true)
   })
 })
