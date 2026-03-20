@@ -1,6 +1,13 @@
-let audioContext: AudioContext | null = null
+const CLICK_SOUND_PATH = "/jjugeul.mp3"
+const MASTER_GAIN = 0.75
+const DRY_GAIN = 0.75
+const WET_GAIN = 0.25
 
-function getAudioContext() {
+let audioContext: AudioContext | null = null
+let clickBufferPromise: Promise<AudioBuffer> | null = null
+let impulseBuffer: AudioBuffer | null = null
+
+const getAudioContext = () => {
   if (typeof globalThis === "undefined" || !("AudioContext" in globalThis)) {
     return null
   }
@@ -12,7 +19,42 @@ function getAudioContext() {
   return audioContext
 }
 
-export async function playJjugeulAudio(seed: number) {
+const getImpulseBuffer = (options: { context: AudioContext }) => {
+  if (impulseBuffer) return impulseBuffer
+
+  const length = Math.floor(options.context.sampleRate * 0.22)
+  const buffer = options.context.createBuffer(
+    2,
+    length,
+    options.context.sampleRate,
+  )
+
+  for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
+    const data = buffer.getChannelData(channel)
+
+    for (let index = 0; index < length; index += 1) {
+      const decay = Math.pow(1 - index / length, 2.2)
+      data[index] = (Math.random() * 2 - 1) * decay
+    }
+  }
+
+  impulseBuffer = buffer
+  return buffer
+}
+
+const loadClickBuffer = async (options: { context: AudioContext }) => {
+  if (!clickBufferPromise) {
+    clickBufferPromise = fetch(CLICK_SOUND_PATH)
+      .then((response) => response.arrayBuffer())
+      .then((arrayBuffer) =>
+        options.context.decodeAudioData(arrayBuffer.slice(0))
+      )
+  }
+
+  return await clickBufferPromise
+}
+
+export const playJjugeulAudio = async (_options: { seed: number }) => {
   const context = getAudioContext()
   if (!context) return
 
@@ -20,46 +62,19 @@ export async function playJjugeulAudio(seed: number) {
     await context.resume()
   }
 
-  const now = context.currentTime
-  const baseFrequency = 180 + (seed % 4) * 25
-
-  const oscillator = new OscillatorNode(context, {
-    type: "triangle",
-    frequency: baseFrequency,
+  const buffer = await loadClickBuffer({ context })
+  const source = new AudioBufferSourceNode(context, { buffer })
+  const dryGain = new GainNode(context, { gain: MASTER_GAIN * DRY_GAIN })
+  const wetGain = new GainNode(context, { gain: MASTER_GAIN * WET_GAIN })
+  const convolver = new ConvolverNode(context, {
+    buffer: getImpulseBuffer({ context }),
   })
 
-  const overtone = new OscillatorNode(context, {
-    type: "sine",
-    frequency: baseFrequency * 1.85,
-  })
+  source.connect(dryGain)
+  source.connect(convolver)
+  convolver.connect(wetGain)
+  dryGain.connect(context.destination)
+  wetGain.connect(context.destination)
 
-  const filter = new BiquadFilterNode(context, {
-    type: "lowpass",
-    frequency: 1100 + (seed % 3) * 120,
-    Q: 1,
-  })
-
-  const gain = new GainNode(context, { gain: 0.0001 })
-
-  oscillator.connect(filter)
-  overtone.connect(filter)
-  filter.connect(gain)
-  gain.connect(context.destination)
-
-  gain.gain.exponentialRampToValueAtTime(0.09, now + 0.01)
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11)
-
-  oscillator.frequency.exponentialRampToValueAtTime(
-    baseFrequency * 0.65,
-    now + 0.1,
-  )
-  overtone.frequency.exponentialRampToValueAtTime(
-    baseFrequency * 1.2,
-    now + 0.1,
-  )
-
-  oscillator.start(now)
-  overtone.start(now)
-  oscillator.stop(now + 0.12)
-  overtone.stop(now + 0.12)
+  source.start()
 }

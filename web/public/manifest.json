@@ -1,7 +1,7 @@
 {
-  "name": "JOOGLE - 쮸글",
-  "short_name": "JOOGLE",
-  "description": "블루 아카이브 검색 엔진 / ブルーアーカイブ検索エンジン / Blue Archive Search Engine",
+  "name": "jjugeul",
+  "short_name": "jjugeul",
+  "description": "jjugeul clicker",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

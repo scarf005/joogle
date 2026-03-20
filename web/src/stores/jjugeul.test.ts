@@ -58,7 +58,7 @@ describe("jjugeul store", () => {
     expect(consumeJjugeulPendingDelta()).toBe(1)
     expect(jjugeulPendingDelta.value).toBe(0)
 
-    restoreJjugeulPendingDelta(2)
+    restoreJjugeulPendingDelta({ delta: 2 })
     expect(jjugeulPendingDelta.value).toBe(2)
   })
 
@@ -75,10 +75,12 @@ describe("jjugeul store", () => {
   })
 
   it("stores leaderboard entries and toggles the panel", () => {
-    setJjugeulLeaderboard([
-      { countryCode: "KR", total: 20 },
-      { countryCode: "JP", total: 15 },
-    ])
+    setJjugeulLeaderboard({
+      entries: [
+        { countryCode: "KR", total: 20 },
+        { countryCode: "JP", total: 15 },
+      ],
+    })
 
     toggleJjugeulLeaderboard()
 

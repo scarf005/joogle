@@ -11,7 +11,7 @@ export default defineConfig({
   workers: isCI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:8787",
+    baseURL: "http://localhost:43127",
     trace: "on-first-retry",
   },
   projects: [
@@ -23,7 +23,7 @@ export default defineConfig({
   webServer: {
     command:
       "deno task build && distrobox enter fedora -- bash -lc 'cd /run/media/home/scarf/repo/etc/joogle && cargo run'",
-    url: "http://localhost:8787",
+    url: "http://localhost:43127",
     reuseExistingServer: !isCI,
   },
 })

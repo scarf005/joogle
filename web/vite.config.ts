@@ -11,7 +11,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: Deno.env.get("API_ORIGIN") ?? "http://127.0.0.1:8787",
+        target: Deno.env.get("API_ORIGIN") ?? "http://127.0.0.1:43127",
         changeOrigin: true,
       },
     },

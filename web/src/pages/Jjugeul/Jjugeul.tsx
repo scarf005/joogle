@@ -5,8 +5,10 @@ import handImage from "../../assets/hand.webp"
 import joogleImage from "../../assets/joogle.webp"
 import suzumiImage from "../../assets/suzumi.webp"
 import {
+  createJjugeulWebSocket,
   fetchJjugeulLeaderboard,
   fetchJjugeulTotals,
+  type JjugeulLiveResponse,
   postJjugeulClicks,
   sendBeaconJjugeulClicks,
 } from "../../services/jjugeulApi.ts"
@@ -29,7 +31,7 @@ import {
   toggleJjugeulLeaderboard,
 } from "../../stores/jjugeul.ts"
 
-function isHandledKeyboardPress(event: KeyboardEvent) {
+const isHandledKeyboardPress = (event: KeyboardEvent) => {
   if (event.metaKey || event.ctrlKey || event.altKey) return false
 
   const ignoredKeys = new Set([
@@ -47,71 +49,110 @@ function isHandledKeyboardPress(event: KeyboardEvent) {
   return !ignoredKeys.has(event.key)
 }
 
-function isControlTarget(target: EventTarget | null) {
+const isControlTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) return false
 
   return Boolean(target.closest("button, a, input, select, textarea"))
 }
 
-export function Jjugeul() {
+const applyLiveMessage = (options: { message: JjugeulLiveResponse }) => {
+  setJjugeulRemoteTotals({ ...options.message.totals })
+  setJjugeulLeaderboard({ entries: options.message.leaderboard })
+}
+
+export const Jjugeul = () => {
+  const isDisposedRef = useRef(false)
   const isSyncingRef = useRef(false)
   const stageRef = useRef<HTMLButtonElement>(null)
+  const socketRef = useRef<WebSocket | null>(null)
+
+  const syncSnapshot = async () => {
+    try {
+      setJjugeulRemoteTotals(await fetchJjugeulTotals())
+    } catch {
+      return
+    }
+  }
 
   const syncLeaderboard = async () => {
     try {
       const response = await fetchJjugeulLeaderboard()
-      setJjugeulLeaderboard(response.entries)
+      setJjugeulLeaderboard({ entries: response.entries })
     } catch {
       return
     }
+  }
+
+  const flushPending = async () => {
+    if (isSyncingRef.current) return
+
+    const delta = consumeJjugeulPendingDelta()
+    if (delta === 0) return
+
+    isSyncingRef.current = true
+
+    try {
+      setJjugeulRemoteTotals(await postJjugeulClicks({ delta }))
+    } catch {
+      restoreJjugeulPendingDelta({ delta })
+    } finally {
+      isSyncingRef.current = false
+    }
+  }
+
+  const connectLive = () => {
+    const socket = createJjugeulWebSocket()
+    if (!socket) return
+
+    socket.onmessage = (event) => {
+      try {
+        applyLiveMessage({
+          message: JSON.parse(event.data) as JjugeulLiveResponse,
+        })
+      } catch {
+        return
+      }
+    }
+
+    socket.onclose = () => {
+      socketRef.current = null
+
+      if (isDisposedRef.current) {
+        return
+      }
+
+      globalThis.setTimeout(() => {
+        if (!socketRef.current) {
+          connectLive()
+        }
+      }, 1500)
+    }
+
+    socketRef.current = socket
   }
 
   const handlePress = async () => {
     const didPress = pressJjugeul()
     if (!didPress) return
 
-    await playJjugeulAudio(jjugeulBurstSeed.value)
+    await playJjugeulAudio({ seed: jjugeulBurstSeed.value })
   }
 
   useEffect(() => {
-    const syncSnapshot = async () => {
-      try {
-        setJjugeulRemoteTotals(await fetchJjugeulTotals())
-      } catch {
-        return
-      }
-    }
-
-    const flushPending = async () => {
-      if (isSyncingRef.current) return
-
-      const delta = consumeJjugeulPendingDelta()
-      if (delta === 0) return
-
-      isSyncingRef.current = true
-
-      try {
-        setJjugeulRemoteTotals(await postJjugeulClicks(delta))
-        if (jjugeulLeaderboardOpen.value) {
-          await syncLeaderboard()
-        }
-      } catch {
-        restoreJjugeulPendingDelta(delta)
-      } finally {
-        isSyncingRef.current = false
-      }
-    }
-
+    isDisposedRef.current = false
     void syncSnapshot()
     void syncLeaderboard()
+    connectLive()
     stageRef.current?.focus()
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         releaseJjugeul()
+
         if (jjugeulLeaderboardOpen.value) {
           toggleJjugeulLeaderboard()
         }
+
         return
       }
 
@@ -128,14 +169,14 @@ export function Jjugeul() {
     }
 
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        const delta = consumeJjugeulPendingDelta()
-        if (delta > 0 && !sendBeaconJjugeulClicks(delta)) {
-          restoreJjugeulPendingDelta(delta)
-        }
+      if (!document.hidden) return
 
-        releaseJjugeul()
+      const delta = consumeJjugeulPendingDelta()
+      if (delta > 0 && !sendBeaconJjugeulClicks({ delta })) {
+        restoreJjugeulPendingDelta({ delta })
       }
+
+      releaseJjugeul()
     }
 
     const handleWindowBlur = () => {
@@ -153,15 +194,9 @@ export function Jjugeul() {
       void flushPending()
     }, 800)
 
-    const leaderboardTimer = globalThis.setInterval(() => {
-      if (jjugeulLeaderboardOpen.value) {
-        void syncLeaderboard()
-      }
-    }, 4000)
-
     return () => {
+      isDisposedRef.current = true
       globalThis.clearInterval(syncTimer)
-      globalThis.clearInterval(leaderboardTimer)
       globalThis.removeEventListener("keydown", handleKeyDown)
       globalThis.removeEventListener("keyup", handleKeyUp)
       globalThis.removeEventListener("pointerup", handleWindowBlur)
@@ -170,10 +205,11 @@ export function Jjugeul() {
       document.removeEventListener("visibilitychange", handleVisibilityChange)
 
       const delta = consumeJjugeulPendingDelta()
-      if (delta > 0 && !sendBeaconJjugeulClicks(delta)) {
-        restoreJjugeulPendingDelta(delta)
+      if (delta > 0 && !sendBeaconJjugeulClicks({ delta })) {
+        restoreJjugeulPendingDelta({ delta })
       }
 
+      socketRef.current?.close()
       releaseJjugeul()
     }
   }, [])
@@ -190,8 +226,9 @@ export function Jjugeul() {
         onClick={() => {
           toggleJjugeulLeaderboard()
 
-          if (!jjugeulLeaderboardOpen.value) return
-          void syncLeaderboard()
+          if (jjugeulLeaderboardOpen.value) {
+            void syncLeaderboard()
+          }
         }}
       >
         <svg

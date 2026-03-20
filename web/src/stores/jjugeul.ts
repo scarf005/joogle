@@ -1,5 +1,10 @@
 import { signal } from "@preact/signals"
 
+export interface JjugeulLeaderboardEntry {
+  countryCode: string
+  total: number
+}
+
 export const jjugeulCount = signal(0)
 export const jjugeulBurstSeed = signal(0)
 export const jjugeulPendingDelta = signal(0)
@@ -10,12 +15,7 @@ export const jjugeulGlobalTotal = signal(0)
 export const jjugeulLeaderboardOpen = signal(false)
 export const jjugeulLeaderboard = signal<JjugeulLeaderboardEntry[]>([])
 
-export interface JjugeulLeaderboardEntry {
-  countryCode: string
-  total: number
-}
-
-export function pressJjugeul() {
+export const pressJjugeul = () => {
   if (jjugeulPressed.value) return false
 
   jjugeulPressed.value = true
@@ -26,41 +26,43 @@ export function pressJjugeul() {
   return true
 }
 
-export function releaseJjugeul() {
+export const releaseJjugeul = () => {
   jjugeulPressed.value = false
 }
 
-export function resetJjugeulSession() {
+export const resetJjugeulSession = () => {
   jjugeulCount.value = 0
   jjugeulBurstSeed.value = 0
   jjugeulPendingDelta.value = 0
   jjugeulPressed.value = false
 }
 
-export function consumeJjugeulPendingDelta() {
+export const consumeJjugeulPendingDelta = () => {
   const delta = jjugeulPendingDelta.value
   jjugeulPendingDelta.value = 0
   return delta
 }
 
-export function restoreJjugeulPendingDelta(delta: number) {
-  jjugeulPendingDelta.value += delta
+export const restoreJjugeulPendingDelta = (options: { delta: number }) => {
+  jjugeulPendingDelta.value += options.delta
 }
 
-export function setJjugeulRemoteTotals(options: {
+export const setJjugeulRemoteTotals = (options: {
   countryCode: string
   countryTotal: number
   globalTotal: number
-}) {
+}) => {
   jjugeulCountryCode.value = options.countryCode
   jjugeulCountryTotal.value = options.countryTotal
   jjugeulGlobalTotal.value = options.globalTotal
 }
 
-export function setJjugeulLeaderboard(entries: JjugeulLeaderboardEntry[]) {
-  jjugeulLeaderboard.value = entries
+export const setJjugeulLeaderboard = (options: {
+  entries: JjugeulLeaderboardEntry[]
+}) => {
+  jjugeulLeaderboard.value = options.entries
 }
 
-export function toggleJjugeulLeaderboard() {
+export const toggleJjugeulLeaderboard = () => {
   jjugeulLeaderboardOpen.value = !jjugeulLeaderboardOpen.value
 }
