@@ -11,15 +11,25 @@ use std::{
 
 use axum::{
     Json, Router,
-    extract::{ConnectInfo, DefaultBodyLimit, State},
+    extract::{
+        ConnectInfo, DefaultBodyLimit, State,
+        ws::{Message, WebSocket, WebSocketUpgrade},
+    },
     http::{HeaderMap, StatusCode},
     response::IntoResponse,
     routing::get,
 };
 use bincode::config::standard;
 use dashmap::DashMap;
+use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use tokio::{fs, net::TcpListener, signal, sync::RwLock, time::interval};
+use tokio::{
+    fs,
+    net::TcpListener,
+    signal,
+    sync::{RwLock, broadcast},
+    time::interval,
+};
 use tower_http::{
     compression::CompressionLayer,
     limit::RequestBodyLimitLayer,
@@ -29,7 +39,7 @@ use tower_http::{
 use tracing::info;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-const DEFAULT_PORT: u16 = 8787;
+const DEFAULT_PORT: u16 = 43127;
 const MAX_DELTA: u16 = 32;
 const LIMITER_BURST: f64 = 12.0;
 const LIMITER_REFILL_PER_SECOND: f64 = 4.0;
@@ -42,6 +52,7 @@ struct AppState {
     store: Arc<RwLock<ClickStore>>,
     storage_path: Arc<PathBuf>,
     dirty: Arc<AtomicBool>,
+    events: broadcast::Sender<LiveResponse>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -64,7 +75,7 @@ struct ClickRequest {
     delta: u16,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct ClickResponse {
     country_code: String,
@@ -72,7 +83,7 @@ struct ClickResponse {
     global_total: u64,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct CountryLeaderboardEntry {
     country_code: String,
@@ -83,6 +94,13 @@ struct CountryLeaderboardEntry {
 #[serde(rename_all = "camelCase")]
 struct LeaderboardResponse {
     entries: Vec<CountryLeaderboardEntry>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct LiveResponse {
+    totals: ClickResponse,
+    leaderboard: Vec<CountryLeaderboardEntry>,
 }
 
 #[derive(Debug, Serialize)]
@@ -137,6 +155,13 @@ impl ClickStore {
         });
 
         LeaderboardResponse { entries }
+    }
+
+    fn live_response(&self, country_code: &str) -> LiveResponse {
+        LiveResponse {
+            totals: self.snapshot(country_code),
+            leaderboard: self.leaderboard().entries,
+        }
     }
 }
 
@@ -199,12 +224,14 @@ async fn main() {
 
     let storage_path = storage_path();
     let store = load_store(&storage_path).await.unwrap_or_default();
+    let (events, _) = broadcast::channel(128);
 
     let state = AppState {
         limits: Arc::new(DashMap::new()),
         store: Arc::new(RwLock::new(store)),
         storage_path: Arc::new(storage_path),
         dirty: Arc::new(AtomicBool::new(false)),
+        events,
     };
 
     spawn_persist_loop(state.clone());
@@ -213,6 +240,7 @@ async fn main() {
     let app = Router::new()
         .route("/api/jjugeul", get(get_clicks).post(post_clicks))
         .route("/api/jjugeul/leaderboard", get(get_leaderboard))
+        .route("/api/jjugeul/live", get(get_live))
         .fallback_service(
             ServeDir::new(frontend_dist_dir())
                 .not_found_service(ServeFile::new(frontend_dist_dir().join("index.html"))),
@@ -295,13 +323,83 @@ async fn post_clicks(
         store.apply_delta(&country_code, payload.delta)
     };
 
+    let live_message = {
+        let store = state.store.read().await;
+        store.live_response(&country_code)
+    };
+
     state.dirty.store(true, Ordering::Relaxed);
+    let _ = state.events.send(live_message);
 
     (StatusCode::ACCEPTED, Json(response)).into_response()
 }
 
 async fn get_leaderboard(State(state): State<AppState>) -> impl IntoResponse {
     Json(state.store.read().await.leaderboard())
+}
+
+async fn get_live(
+    ws: WebSocketUpgrade,
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> impl IntoResponse {
+    let country_code = detect_country_code(&headers);
+
+    ws.on_upgrade(move |socket| handle_live_socket(socket, state, country_code))
+}
+
+async fn handle_live_socket(socket: WebSocket, state: AppState, country_code: String) {
+    let (mut sender, mut receiver) = socket.split();
+    let initial = {
+        let store = state.store.read().await;
+        store.live_response(&country_code)
+    };
+
+    if send_live_message(&mut sender, &initial).await.is_err() {
+        return;
+    }
+
+    let mut events = state.events.subscribe();
+
+    loop {
+        tokio::select! {
+            maybe_message = events.recv() => {
+                match maybe_message {
+                    Ok(_) => {
+                        let message = {
+                            let store = state.store.read().await;
+                            store.live_response(&country_code)
+                        };
+
+                        if send_live_message(&mut sender, &message).await.is_err() {
+                            return;
+                        }
+                    }
+                    Err(broadcast::error::RecvError::Lagged(_)) => continue,
+                    Err(broadcast::error::RecvError::Closed) => return,
+                }
+            }
+            incoming = receiver.next() => {
+                match incoming {
+                    Some(Ok(Message::Close(_))) | None => return,
+                    Some(Ok(_)) => continue,
+                    Some(Err(_)) => return,
+                }
+            }
+        }
+    }
+}
+
+async fn send_live_message(
+    sender: &mut futures_util::stream::SplitSink<WebSocket, Message>,
+    payload: &LiveResponse,
+) -> Result<(), serde_json::Error> {
+    let body = serde_json::to_string(payload)?;
+
+    sender
+        .send(Message::Text(body.into()))
+        .await
+        .map_err(|error| serde_json::Error::io(std::io::Error::other(error)))
 }
 
 fn spawn_persist_loop(state: AppState) {
