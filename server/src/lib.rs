@@ -1,3 +1,5 @@
+mod student_ids;
+
 use std::{
     collections::HashMap,
     env,
@@ -547,7 +549,7 @@ fn validate_clicks(clicks: &[ClickEntry]) -> Result<Vec<ClickEntry>, &'static st
             return Err("invalid_delta");
         }
 
-        if click.student_id == 0 {
+        if !student_ids::is_valid_student_id(click.student_id) {
             return Err("invalid_student_id");
         }
 
@@ -770,5 +772,23 @@ mod tests {
         assert_eq!(reloaded.per_country.get("JP"), Some(&5));
         assert_eq!(reloaded.per_student.get(&10000), Some(&13));
         assert_eq!(reloaded.per_student.get(&10001), Some(&6));
+    }
+
+    #[test]
+    fn rejects_unknown_student_ids() {
+        let valid = validate_clicks(&[ClickEntry {
+            student_id: 10000,
+            delta: 2,
+        }])
+        .expect("valid click batch");
+
+        assert_eq!(valid[0].student_id, 10000);
+        assert_eq!(
+            validate_clicks(&[ClickEntry {
+                student_id: 999,
+                delta: 2,
+            }]),
+            Err("invalid_student_id")
+        );
     }
 }
