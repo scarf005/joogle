@@ -114,8 +114,8 @@ both leaderboards after accepted click batches.
 
 ## Deployment Notes
 
-- `web/dist/` is served directly by the Rust server in production
-- GitHub Pages deployment still exists for static preview builds
+- Production container ships the Rust server only
+- `web/dist/` is published separately to GitHub Pages as the SPA
 - CI lives in `.github/workflows/ci.yml`
 - Cloudflare Tunnel notes live in `docs/cloudflare-tunnel.md`
 
