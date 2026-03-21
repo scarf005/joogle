@@ -1,0 +1,42 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: ops/containers/Containerfile.server.dev
+    working_dir: /app
+    command: cargo watch --manifest-path server/Cargo.toml -x run
+    environment:
+      PORT: 43127
+      RUST_LOG: server=info,tower_http=info
+    ports:
+      - "43127:43127"
+    volumes:
+      - ./:/app:Z
+      - cargo-registry:/home/nonroot/.cargo/registry
+      - cargo-git:/home/nonroot/.cargo/git
+      - cargo-target:/app/target
+      - server-data:/app/server/data
+
+  web:
+    build:
+      context: .
+      dockerfile: ops/containers/Containerfile.web.dev
+    working_dir: /app/web
+    command: deno task dev --host 0.0.0.0
+    environment:
+      API_ORIGIN: http://server:43127
+      DENO_DIR: /deno-dir
+    depends_on:
+      - server
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web:/app/web:Z
+      - deno-dir:/deno-dir
+
+volumes:
+  cargo-registry:
+  cargo-git:
+  cargo-target:
+  deno-dir:
+  server-data:

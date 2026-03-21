@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ops/containers/Containerfile.prod
+    ports:
+      - "43127:43127"
+    environment:
+      PORT: 43127
+    volumes:
+      - server-data:/app/server/data
+    restart: unless-stopped
+
+volumes:
+  server-data:

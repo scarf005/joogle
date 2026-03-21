@@ -1,0 +1,6 @@
+FROM cgr.dev/chainguard/rust:latest-dev
+WORKDIR /app
+
+RUN cargo install cargo-watch --locked
+
+CMD ["cargo", "watch", "--manifest-path", "server/Cargo.toml", "-x", "run"]

@@ -1,0 +1,6 @@
+FROM cgr.dev/chainguard/deno:latest-dev
+WORKDIR /app/web
+
+ENV DENO_DIR=/deno-dir
+
+CMD ["deno", "task", "dev", "--host", "0.0.0.0"]
