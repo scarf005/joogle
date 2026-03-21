@@ -1,11 +1,11 @@
 {
-  "name": "jjugeul",
-  "short_name": "jjugeul",
-  "description": "jjugeul clicker",
+  "name": "JOOGLE",
+  "short_name": "JOOGLE",
+  "description": "JOOGLE click board",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4285f4",
+  "theme_color": "#111111",
   "lang": "ko",
   "categories": ["entertainment", "games"],
   "icons": [
