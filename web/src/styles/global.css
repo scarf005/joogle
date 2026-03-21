@@ -7,8 +7,9 @@
 html,
 body {
   min-height: 100%;
-  font-family: Arial, sans-serif;
-  background: #fff;
+  font-family: "IBM Plex Mono", "Iosevka", "Fira Mono", monospace;
+  background: #ffffff;
+  color: #000000;
 }
 
 body,
@@ -19,4 +20,8 @@ body,
 button,
 input {
   font: inherit;
+}
+
+button {
+  cursor: pointer;
 }

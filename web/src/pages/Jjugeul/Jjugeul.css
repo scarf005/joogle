@@ -1,57 +1,122 @@
 .jjugeul {
+  --jjugeul-accent: #000000;
+  --jjugeul-surface: #ffffff;
   min-height: 100vh;
-  background: #fff;
+  color: #000000;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.07) 1px, transparent 1px) 0 0 / 24px
+    24px,
+    linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(180deg, #ffffff 0%, #f4f4f4 100%);
+}
+
+.jjugeul__hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 10px;
+}
+
+.jjugeul__identity,
+.jjugeul__summary-card,
+.jjugeul__leaderboard,
+.jjugeul__student-dock,
+.jjugeul__student-badge,
+.jjugeul__student-card {
+  border: 2px solid #000000;
+  background: #ffffff;
+}
+
+.jjugeul__identity {
+  display: grid;
+  gap: 2px;
+  padding: 8px;
+}
+
+.jjugeul__student-name {
+  font-size: clamp(28px, 4vw, 44px);
+  line-height: 0.9;
+}
+
+.jjugeul__student-title,
+.jjugeul__summary-card span,
+.jjugeul__student-card span,
+.jjugeul__student-card-total,
+.jjugeul__student-dock-head span,
+.jjugeul__leaderboard-meta {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.jjugeul__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.jjugeul__summary-card {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px;
+}
+
+.jjugeul__summary-card strong {
+  font-size: clamp(18px, 2.3vw, 28px);
+  line-height: 1;
+}
+
+.jjugeul__leaderboard-toggle {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: 2px solid #000000;
+  background: #ffffff;
+  color: #000000;
+}
+
+.jjugeul__leaderboard-icon {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
 }
 
 .jjugeul__counter {
   position: fixed;
-  top: 20px;
+  top: clamp(102px, 16vw, 150px);
   left: 50%;
   z-index: 4;
-  color: #000;
-  font-size: clamp(52px, 9vw, 132px);
+  color: #000000;
+  font-size: clamp(62px, 11vw, 152px);
   font-weight: 900;
-  line-height: 0.88;
-  letter-spacing: -0.08em;
+  line-height: 0.84;
+  letter-spacing: -0.09em;
   transform: translateX(-50%);
   pointer-events: none;
 }
 
-.jjugeul__leaderboard-toggle {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 5;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 0;
-  background: transparent;
-  color: #000;
-}
-
-.jjugeul__leaderboard-icon {
-  width: 28px;
-  height: 28px;
-  fill: currentColor;
-}
-
 .jjugeul__leaderboard {
   position: fixed;
-  top: 68px;
-  right: 24px;
+  top: 90px;
+  right: 10px;
   z-index: 5;
-  width: min(280px, calc(100vw - 32px));
-  padding: 14px 16px;
-  border: 2px solid #000;
-  background: #fff;
-  color: #000;
+  width: min(560px, calc(100vw - 20px));
+  padding: 12px;
 }
 
 .jjugeul__leaderboard-head,
 .jjugeul__leaderboard-meta,
-.jjugeul__leaderboard-item {
+.jjugeul__leaderboard-item,
+.jjugeul__student-dock-head,
+.jjugeul__student-badge {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -63,28 +128,37 @@
   font-weight: 800;
 }
 
+.jjugeul__leaderboard-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.jjugeul__leaderboard-columns section {
+  min-width: 0;
+}
+
 .jjugeul__leaderboard-meta {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #000;
-  font-size: 12px;
-  font-weight: 700;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #000000;
 }
 
 .jjugeul__leaderboard-list {
-  margin-top: 10px;
+  margin-top: 8px;
   list-style: none;
 }
 
 .jjugeul__leaderboard-item {
-  padding: 6px 0;
-  border-top: 1px solid #000;
-  font-size: 14px;
+  padding: 8px 0;
+  border-top: 1px solid #000000;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .jjugeul__leaderboard-item--current {
-  font-weight: 900;
+  background: #000000;
+  color: #ffffff;
 }
 
 .jjugeul__stage {
@@ -93,7 +167,7 @@
   width: 100vw;
   min-height: 100vh;
   border: 0;
-  background: #fff;
+  background: transparent;
   overflow: hidden;
   touch-action: manipulation;
   user-select: none;
@@ -104,9 +178,35 @@
   outline: none;
 }
 
+.jjugeul__spotlight {
+  position: absolute;
+  inset: 26% 50% auto auto;
+  width: min(48vw, 560px);
+  height: min(48vw, 560px);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.16), transparent 72%);
+  transform: translateX(18%);
+  pointer-events: none;
+}
+
+.jjugeul__student-badge {
+  position: absolute;
+  top: clamp(214px, 29vw, 264px);
+  left: 50%;
+  z-index: 4;
+  min-width: min(280px, calc(100vw - 44px));
+  padding: 10px 12px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.jjugeul__student-badge strong {
+  font-size: 18px;
+}
+
 .jjugeul__mascot-frame {
   position: absolute;
-  inset: 116px 0 0;
+  inset: 170px 0 176px;
 }
 
 .jjugeul__layer-set {
@@ -115,257 +215,161 @@
   transform-origin: center bottom;
 }
 
-.jjugeul__layer-set--character {
-  animation: jjugeul-body-float 3s ease-in-out infinite;
-}
-
-.jjugeul__layer-set--press {
-  animation: jjugeul-hand-hover 2.1s ease-in-out infinite;
-}
-
-.jjugeul__layer-set--impact {
-  animation-iteration-count: 1;
-  animation-fill-mode: both;
-}
-
 .jjugeul__layer {
   position: absolute;
   inset: 0;
-  width: clamp(280px, 46vw, 560px);
-  height: clamp(280px, 46vw, 560px);
+  width: clamp(300px, 46vw, 560px);
+  height: clamp(300px, 46vw, 560px);
   margin: auto;
   object-fit: contain;
   pointer-events: none;
   transform-origin: center bottom;
-  will-change: transform, opacity;
 }
 
 .jjugeul__layer--halo {
-  transform: translateY(-1%) rotate(-3deg);
-  animation: jjugeul-halo-float 2.6s ease-in-out infinite;
-}
-
-.jjugeul__layer--suzumi {
-  transform: translateY(1.2%) rotate(-0.6deg);
-  animation: jjugeul-suzumi-idle 2.8s ease-in-out infinite;
-}
-
-.jjugeul__layer--hand {
-  transform: translateY(-9%) translateX(-0.4%) rotate(-1deg);
-  animation: jjugeul-hand-idle 2s ease-in-out infinite;
+  opacity: 0.85;
 }
 
 .jjugeul__layer--joogle {
   opacity: 0;
-  transform: translateY(7%) scale(0.92);
-}
-
-.jjugeul__layer--impact {
-  animation-iteration-count: 1;
-  animation-fill-mode: both;
 }
 
 .jjugeul__stage--impact .jjugeul__layer-set--character {
-  animation-name: jjugeul-body-hit;
-  animation-duration: 0.18s;
+  transform: translateY(2%);
 }
 
 .jjugeul__stage--impact .jjugeul__layer-set--press {
-  animation-name: jjugeul-hand-drop;
-  animation-duration: 0.16s;
-}
-
-.jjugeul__stage--impact .jjugeul__layer--halo {
-  animation-name: jjugeul-halo-hit;
-  animation-duration: 0.18s;
-}
-
-.jjugeul__stage--impact .jjugeul__layer--suzumi {
-  animation-name: jjugeul-suzumi-hit;
-  animation-duration: 0.18s;
-}
-
-.jjugeul__stage--impact .jjugeul__layer--hand {
-  animation-name: jjugeul-hand-hit;
-  animation-duration: 0.16s;
+  transform: translateY(6%);
 }
 
 .jjugeul__stage--impact .jjugeul__layer--joogle {
-  animation-name: jjugeul-joogle-hit;
-  animation-duration: 0.18s;
   opacity: 1;
 }
 
-@keyframes jjugeul-body-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-1%) rotate(0.4deg);
-  }
+.jjugeul__student-dock {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  z-index: 5;
+  padding: 10px;
 }
 
-@keyframes jjugeul-halo-float {
-  0%,
-  100% {
-    transform: translateY(-1%) rotate(-3deg);
-  }
-
-  50% {
-    transform: translateY(-3.4%) rotate(1.8deg);
-  }
+.jjugeul__student-dock-head {
+  margin-bottom: 8px;
 }
 
-@keyframes jjugeul-suzumi-idle {
-  0%,
-  100% {
-    transform: translateY(1.2%) rotate(-0.6deg) scale(1);
-  }
-
-  50% {
-    transform: translateY(0.2%) rotate(0.7deg) scale(1.012);
-  }
+.jjugeul__student-dock-head strong {
+  font-size: 14px;
 }
 
-@keyframes jjugeul-hand-hover {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-1.4%);
-  }
+.jjugeul__student-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
 }
 
-@keyframes jjugeul-hand-idle {
-  0%,
-  100% {
-    transform: translateY(-9%) translateX(-0.4%) rotate(-1deg);
-  }
-
-  50% {
-    transform: translateY(-11.8%) translateX(0.6%) rotate(1deg);
-  }
+.jjugeul__student-card {
+  position: relative;
+  padding: 10px;
+  color: #000000;
+  text-align: left;
 }
 
-@keyframes jjugeul-body-hit {
-  0% {
-    transform: translateY(0) scale(1);
-  }
-
-  40% {
-    transform: translateY(2.8%) translateX(-0.8%) scaleX(1.07) scaleY(0.9);
-  }
-
-  100% {
-    transform: translateY(0) scale(1);
-  }
+.jjugeul__student-card--active {
+  background: #000000;
+  color: #ffffff;
 }
 
-@keyframes jjugeul-halo-hit {
-  0% {
-    transform: translateY(-1%) rotate(-3deg);
-  }
-
-  45% {
-    transform: translateY(1%) rotate(7deg) scaleX(1.04) scaleY(0.88);
-  }
-
-  100% {
-    transform: translateY(-1%) rotate(-3deg);
-  }
+.jjugeul__student-select {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
 }
 
-@keyframes jjugeul-suzumi-hit {
-  0% {
-    transform: translateY(1.2%) rotate(-0.6deg) scale(1);
-  }
-
-  40% {
-    transform: translateY(2.6%) translateX(-1.2%) scaleX(1.08) scaleY(0.88);
-  }
-
-  100% {
-    transform: translateY(1.2%) rotate(-0.6deg) scale(1);
-  }
+.jjugeul__student-card-copy {
+  display: grid;
+  gap: 3px;
+  padding-right: 40px;
 }
 
-@keyframes jjugeul-hand-drop {
-  0% {
-    transform: translateY(0);
-  }
-
-  35% {
-    transform: translateY(6%);
-  }
-
-  100% {
-    transform: translateY(0);
-  }
+.jjugeul__student-card strong {
+  font-size: 18px;
+  line-height: 1;
 }
 
-@keyframes jjugeul-hand-hit {
-  0% {
-    transform: translateY(-9%) translateX(-0.4%) rotate(-1deg);
-  }
-
-  40% {
-    transform: translateY(-1.8%) translateX(0.4%) rotate(1deg);
-  }
-
-  100% {
-    transform: translateY(-9%) translateX(-0.4%) rotate(-1deg);
-  }
+.jjugeul__student-favorite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
 }
 
-@keyframes jjugeul-joogle-hit {
-  0% {
-    opacity: 0;
-    transform: translateY(4%) scale(0.9) rotate(-4deg);
-  }
-
-  45% {
-    opacity: 1;
-    transform: translateY(8%) scale(1) rotate(0deg);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(7%) scale(0.92) rotate(0deg);
-  }
+.jjugeul__student-card-total {
+  font-size: 11px;
 }
 
-@media (max-width: 900px) {
-  .jjugeul__counter {
-    top: 16px;
+@media (max-width: 1100px) {
+  .jjugeul__hud {
+    grid-template-columns: 1fr;
   }
 
   .jjugeul__leaderboard-toggle {
-    top: 18px;
-    right: 18px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
 
   .jjugeul__leaderboard {
-    top: 58px;
-    right: 12px;
+    top: 206px;
   }
 
-  .jjugeul__mascot-frame {
-    inset: 96px 0 0;
-  }
-
-  .jjugeul__layer {
-    width: min(82vw, 460px);
-    height: min(82vw, 460px);
+  .jjugeul__student-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .jjugeul__layer-set,
+@media (max-width: 780px) {
+  .jjugeul__counter {
+    top: 192px;
+  }
+
+  .jjugeul__summary-grid,
+  .jjugeul__leaderboard-columns,
+  .jjugeul__student-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .jjugeul__leaderboard {
+    top: 286px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+  }
+
+  .jjugeul__student-badge {
+    top: 276px;
+  }
+
+  .jjugeul__mascot-frame {
+    inset: 246px 0 260px;
+  }
+
   .jjugeul__layer {
-    animation: none;
+    width: min(86vw, 460px);
+    height: min(86vw, 460px);
   }
 }
