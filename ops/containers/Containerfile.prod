@@ -1,20 +1,18 @@
-FROM cgr.dev/chainguard/rust:latest-dev AS server-build
+FROM docker.io/library/rust:alpine AS server-build
 WORKDIR /app
 
-USER root
-RUN apk add --no-cache sqlite-dev
+RUN apk add --no-cache build-base musl-dev perl
+RUN rustup target add x86_64-unknown-linux-musl
 
 COPY Cargo.toml Cargo.lock ./
 COPY server/Cargo.toml ./server/Cargo.toml
 COPY server/src ./server/src
-RUN cargo build --release --manifest-path server/Cargo.toml
+RUN cargo build --release --target x86_64-unknown-linux-musl --manifest-path server/Cargo.toml
 
-FROM cgr.dev/chainguard/glibc-dynamic:latest
-WORKDIR /app
-
-COPY --from=server-build /app/target/release/server /app/server
+FROM scratch
+COPY --from=server-build /app/target/x86_64-unknown-linux-musl/release/server /server
 
 ENV PORT=43127
 EXPOSE 43127
 
-ENTRYPOINT ["/app/server"]
+ENTRYPOINT ["/server"]

@@ -1,0 +1,14 @@
+- mimic popcat.click
+  - global leaderboard with per country clicks
+  - also per student clicks
+- make user able to choose their favorite students
+- refactor server and web ti be small efficient performant readable
+- prevent abusing
+  - maybe websocket cap'n proto?
+- setup CI
+- prepare cloudflare tunnel
+- write readme and docs
+- forever inprove codebase
+- do TDD
+- prefer FP where perf usnt needed
+- your allowed to use 3rd party lib

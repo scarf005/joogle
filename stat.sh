@@ -5,10 +5,13 @@ ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 COMPOSE_FILE="${COMPOSE_FILE:-compose.dev.yml}"
 SERVER_PACKAGE="${SERVER_PACKAGE:-server}"
 SERVER_BINARY="${SERVER_BINARY:-$ROOT_DIR/target/release/server}"
+SERVER_IMAGE_SERVICE="${SERVER_IMAGE_SERVICE:-app}"
 RUNS="${RUNS:-5}"
 STARTUP_TIMEOUT_SECONDS="${STARTUP_TIMEOUT_SECONDS:-5}"
 STARTUP_SETTLE_MILLISECONDS="${STARTUP_SETTLE_MILLISECONDS:-250}"
+STARTUP_POLL_SECONDS="${STARTUP_POLL_SECONDS:-0.0005}"
 USE_LOCAL_CARGO="${USE_LOCAL_CARGO:-0}"
+SERVER_BINARY_TEMP_DIR=""
 
 cd "$ROOT_DIR"
 
@@ -43,6 +46,11 @@ PY
 }
 
 build_server_binary() {
+  if [ "$COMPOSE_FILE" = "compose.yml" ]; then
+    extract_server_binary_from_image
+    return
+  fi
+
   if [ "$USE_LOCAL_CARGO" = "1" ]; then
     cargo build --release -p "$SERVER_PACKAGE" >/dev/null
     return
@@ -57,6 +65,29 @@ build_server_binary() {
     localhost/joogle_server:latest \
     build --release -p "$SERVER_PACKAGE" >/dev/null 2>&1
 }
+
+extract_server_binary_from_image() {
+  local image
+  image="$(compose_image_name "$SERVER_IMAGE_SERVICE")"
+  local temp_dir
+  temp_dir="$(mktemp -d)"
+  SERVER_BINARY_TEMP_DIR="$temp_dir"
+  local container_id
+  container_id="$(podman create "$image")"
+
+  podman cp "$container_id:/server" "$temp_dir/server" >/dev/null
+  podman rm "$container_id" >/dev/null
+  chmod +x "$temp_dir/server"
+  SERVER_BINARY="$temp_dir/server"
+}
+
+cleanup() {
+  if [ -n "$SERVER_BINARY_TEMP_DIR" ] && [ -d "$SERVER_BINARY_TEMP_DIR" ]; then
+    rm -rf "$SERVER_BINARY_TEMP_DIR"
+  fi
+}
+
+trap cleanup EXIT
 
 compose_services() {
   podman compose --file "$COMPOSE_FILE" config --services
@@ -100,7 +131,7 @@ compose_total_image_size_bytes() {
 }
 
 measure_server() {
-  python - "$SERVER_BINARY" "$RUNS" "$STARTUP_TIMEOUT_SECONDS" "$STARTUP_SETTLE_MILLISECONDS" <<'PY'
+  python - "$SERVER_BINARY" "$RUNS" "$STARTUP_TIMEOUT_SECONDS" "$STARTUP_SETTLE_MILLISECONDS" "$STARTUP_POLL_SECONDS" <<'PY'
 import json
 import os
 import signal
@@ -115,6 +146,7 @@ binary = Path(sys.argv[1])
 runs = int(sys.argv[2])
 timeout_seconds = float(sys.argv[3])
 settle_ms = int(sys.argv[4])
+poll_seconds = float(sys.argv[5])
 
 if not binary.exists():
     raise SystemExit(f"missing server binary: {binary}")
@@ -144,7 +176,7 @@ def wait_until_ready(port: int, pid: int) -> tuple[float, int]:
         peak = max(peak, read_peak_rss_bytes(pid))
 
         try:
-            with socket.create_connection(("127.0.0.1", port), timeout=0.05) as connection:
+            with socket.create_connection(("127.0.0.1", port), timeout=max(poll_seconds, 0.001)) as connection:
                 connection.sendall(b"GET /api/jjugeul HTTP/1.0\r\nHost: 127.0.0.1\r\n\r\n")
                 response = connection.recv(64)
                 if response.startswith(b"HTTP/1.1 200") or response.startswith(b"HTTP/1.0 200"):
@@ -157,7 +189,7 @@ def wait_until_ready(port: int, pid: int) -> tuple[float, int]:
         except OSError:
             pass
 
-        time.sleep(0.005)
+        time.sleep(poll_seconds)
 
     raise TimeoutError(f"server did not become ready within {timeout_seconds:.2f}s")
 
