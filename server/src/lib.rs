@@ -472,7 +472,7 @@ fn apply_click_batch(
     )?;
 
     {
-        let mut student_stmt = tx.prepare_cached(
+        let mut student_stmt = tx.prepare(
             "
             INSERT INTO student_totals(student_id, total)
             VALUES (?1, ?2)
