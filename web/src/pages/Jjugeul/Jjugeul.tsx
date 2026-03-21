@@ -1,4 +1,3 @@
-import type { JSX } from "preact"
 import "./Jjugeul.css"
 import { useEffect, useRef, useState } from "preact/hooks"
 import haloImage from "../../assets/halo.webp"
@@ -11,7 +10,6 @@ import {
   fetchJjugeulSnapshot,
   type JjugeulCountryLeaderboardEntry,
   type JjugeulLiveResponse,
-  type JjugeulStudentLeaderboardEntry,
   postJjugeulClicks,
   sendBeaconJjugeulClicks,
 } from "../../services/jjugeulApi.ts"
@@ -20,7 +18,6 @@ import {
   consumeJjugeulPendingClicks,
   getJjugeulActiveStudent,
   getJjugeulActiveStudentTotal,
-  getJjugeulStudentRoster,
   hydrateJjugeulPreferences,
   jjugeulActiveStudentId,
   jjugeulBurstSeed,
@@ -28,7 +25,6 @@ import {
   jjugeulCountryCode,
   jjugeulCountryLeaderboard,
   jjugeulCountryTotal,
-  jjugeulFavoriteStudentIds,
   jjugeulGlobalTotal,
   jjugeulLeaderboardOpen,
   jjugeulPressed,
@@ -36,10 +32,8 @@ import {
   pressJjugeul,
   releaseJjugeul,
   restoreJjugeulPendingClicks,
-  selectJjugeulStudent,
   setJjugeulLeaderboards,
   setJjugeulRemoteTotals,
-  toggleJjugeulFavoriteStudent,
   toggleJjugeulLeaderboard,
 } from "../../stores/jjugeul.ts"
 
@@ -47,6 +41,7 @@ const compactNumber = new Intl.NumberFormat("en-US")
 
 const isHandledKeyboardPress = (event: KeyboardEvent) => {
   if (event.metaKey || event.ctrlKey || event.altKey) return false
+  if (event.isComposing) return false
 
   const ignoredKeys = new Set([
     "Alt",
@@ -60,20 +55,15 @@ const isHandledKeyboardPress = (event: KeyboardEvent) => {
     "Tab",
   ])
 
-  return !ignoredKeys.has(event.key)
+  if (ignoredKeys.has(event.key)) return false
+
+  return event.key === " " || event.key.length === 1
 }
 
 const isControlTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) return false
 
   return Boolean(target.closest("button, a, input, select, textarea"))
-}
-
-const getStudentTotal = (
-  entries: JjugeulStudentLeaderboardEntry[],
-  studentId: number,
-) => {
-  return entries.find((entry) => entry.studentId === studentId)?.total ?? 0
 }
 
 const getCountryPosition = (
@@ -114,22 +104,7 @@ export const Jjugeul = () => {
     refresh()
   }
 
-  const handleFavoriteToggle = (studentId: number) => {
-    toggleJjugeulFavoriteStudent({ studentId })
-    refresh()
-  }
-
-  const handleStudentSelect = (studentId: number) => {
-    selectJjugeulStudent({ studentId })
-    refresh()
-  }
-
   const currentStudent = getJjugeulActiveStudent()
-  const favoriteStudentIds = new Set(jjugeulFavoriteStudentIds.value)
-  const stageStyle = {
-    "--jjugeul-accent": currentStudent.accent,
-    "--jjugeul-surface": currentStudent.surface,
-  } as JSX.CSSProperties
 
   const syncSnapshot = async () => {
     try {
@@ -270,13 +245,8 @@ export const Jjugeul = () => {
   }, [])
 
   return (
-    <main class="jjugeul" style={stageStyle}>
+    <main class="jjugeul">
       <header class="jjugeul__hud">
-        <div class="jjugeul__identity">
-          <strong class="jjugeul__student-name">JOOGLE</strong>
-          <span class="jjugeul__student-title">{currentStudent.name}</span>
-        </div>
-
         <div class="jjugeul__summary-grid">
           <article class="jjugeul__summary-card">
             <span>WORLD</span>
@@ -397,13 +367,6 @@ export const Jjugeul = () => {
         data-jjugeul-stage
       >
         <span class="jjugeul__spotlight" aria-hidden="true" />
-        <span class="jjugeul__student-badge">
-          <span>{currentStudent.name}</span>
-          <strong>
-            {compactNumber.format(getJjugeulActiveStudentTotal())}
-          </strong>
-        </span>
-
         <span class="jjugeul__mascot-frame" role="img" aria-label="JOOGLE">
           <span
             class={`jjugeul__layer-set jjugeul__layer-set--character ${
@@ -456,63 +419,6 @@ export const Jjugeul = () => {
           </span>
         </span>
       </button>
-
-      <section class="jjugeul__student-dock" aria-label="ROSTER">
-        <div class="jjugeul__student-dock-head">
-          <strong>JOOGLE</strong>
-          <span>{jjugeulFavoriteStudentIds.value.length}</span>
-        </div>
-
-        <div class="jjugeul__student-grid">
-          {getJjugeulStudentRoster().map((student) => {
-            const isFavorite = favoriteStudentIds.has(student.id)
-            const isActive = student.id === jjugeulActiveStudentId.value
-            const studentTotal = getStudentTotal(
-              jjugeulStudentLeaderboard.value,
-              student.id,
-            )
-
-            return (
-              <article
-                key={student.id}
-                class={`jjugeul__student-card ${
-                  isActive ? "jjugeul__student-card--active" : ""
-                }`}
-              >
-                <button
-                  type="button"
-                  class="jjugeul__student-select"
-                  onClick={() => {
-                    handleStudentSelect(student.id)
-                  }}
-                >
-                  <span class="jjugeul__student-card-copy">
-                    <strong>{student.name}</strong>
-                    <span>{student.id}</span>
-                  </span>
-
-                  <span class="jjugeul__student-card-total">
-                    {compactNumber.format(studentTotal)}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  class="jjugeul__student-favorite"
-                  onClick={() => {
-                    handleFavoriteToggle(student.id)
-                  }}
-                  aria-label={`${
-                    isFavorite ? "Unfavorite" : "Favorite"
-                  } ${student.name}`}
-                >
-                  {isFavorite ? "■" : "□"}
-                </button>
-              </article>
-            )
-          })}
-        </div>
-      </section>
     </main>
   )
 }

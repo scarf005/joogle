@@ -1,7 +1,9 @@
 const CLICK_SOUND_PATH = "/jjugeul.mp3"
-const MASTER_GAIN = 0.75
+const MASTER_GAIN = 0.375
 const DRY_GAIN = 0.75
-const WET_GAIN = 0.25
+const WET_GAIN = 1.1
+const CLICK_OFFSET = 0.1
+const ATTACK_TIME = 0.004
 
 let audioContext: AudioContext | null = null
 let clickBufferPromise: Promise<AudioBuffer> | null = null
@@ -22,7 +24,7 @@ const getAudioContext = () => {
 const getImpulseBuffer = (options: { context: AudioContext }) => {
   if (impulseBuffer) return impulseBuffer
 
-  const length = Math.floor(options.context.sampleRate * 0.22)
+  const length = Math.floor(options.context.sampleRate * 1.6)
   const buffer = options.context.createBuffer(
     2,
     length,
@@ -33,7 +35,7 @@ const getImpulseBuffer = (options: { context: AudioContext }) => {
     const data = buffer.getChannelData(channel)
 
     for (let index = 0; index < length; index += 1) {
-      const decay = Math.pow(1 - index / length, 2.2)
+      const decay = Math.pow(1 - index / length, 1.4)
       data[index] = (Math.random() * 2 - 1) * decay
     }
   }
@@ -69,6 +71,18 @@ export const playJjugeulAudio = async (_options: { seed: number }) => {
   const convolver = new ConvolverNode(context, {
     buffer: getImpulseBuffer({ context }),
   })
+  const now = context.currentTime
+
+  dryGain.gain.setValueAtTime(0, now)
+  wetGain.gain.setValueAtTime(0, now)
+  dryGain.gain.linearRampToValueAtTime(
+    MASTER_GAIN * DRY_GAIN,
+    now + ATTACK_TIME,
+  )
+  wetGain.gain.linearRampToValueAtTime(
+    MASTER_GAIN * WET_GAIN,
+    now + ATTACK_TIME,
+  )
 
   source.connect(dryGain)
   source.connect(convolver)
@@ -76,5 +90,5 @@ export const playJjugeulAudio = async (_options: { seed: number }) => {
   dryGain.connect(context.destination)
   wetGain.connect(context.destination)
 
-  source.start()
+  source.start(now, CLICK_OFFSET)
 }

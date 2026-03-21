@@ -22,8 +22,8 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      "deno task build && distrobox enter fedora -- bash -lc 'cd /run/media/home/scarf/repo/etc/joogle && cargo run'",
+      "deno task build && cargo run --manifest-path ../server/Cargo.toml",
     url: "http://localhost:43127",
-    reuseExistingServer: !isCI,
+    reuseExistingServer: false,
   },
 })
