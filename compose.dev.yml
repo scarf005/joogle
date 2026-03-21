@@ -27,13 +27,12 @@ services:
     environment:
       API_ORIGIN: http://server:43127
       DENO_DIR: /deno-dir
-      VITE_WATCH_POLLING: "true"
     depends_on:
       - server
     ports:
       - "5173:5173"
     volumes:
-      - ./web:/app/web:Z
+      - ./web:/app/web:z
       - deno-dir:/deno-dir
 
 volumes:
