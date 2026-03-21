@@ -1,9 +1,11 @@
+import { createJjugeulRandom, randomBetween } from "../utils/jjugeulRandom.ts"
+
 const CLICK_SOUND_PATH = "/jjugeul.mp3"
-const MASTER_GAIN = 0.375
+const MASTER_GAIN = 0.1875
 const DRY_GAIN = 0.75
 const WET_GAIN = 1.1
 const CLICK_OFFSET = 0.1
-const ATTACK_TIME = 0.004
+const ATTACK_TIME = 0.0012
 
 let audioContext: AudioContext | null = null
 let clickBufferPromise: Promise<AudioBuffer> | null = null
@@ -65,9 +67,20 @@ export const playJjugeulAudio = async (_options: { seed: number }) => {
   }
 
   const buffer = await loadClickBuffer({ context })
+  const random = createJjugeulRandom({ seed: _options.seed })
+  const dryLevel = MASTER_GAIN * DRY_GAIN * randomBetween({
+    random,
+    min: 0.82,
+    max: 1,
+  })
+  const wetLevel = MASTER_GAIN * WET_GAIN * randomBetween({
+    random,
+    min: 0.78,
+    max: 1.18,
+  })
   const source = new AudioBufferSourceNode(context, { buffer })
-  const dryGain = new GainNode(context, { gain: MASTER_GAIN * DRY_GAIN })
-  const wetGain = new GainNode(context, { gain: MASTER_GAIN * WET_GAIN })
+  const dryGain = new GainNode(context, { gain: 0 })
+  const wetGain = new GainNode(context, { gain: 0 })
   const convolver = new ConvolverNode(context, {
     buffer: getImpulseBuffer({ context }),
   })
@@ -75,12 +88,12 @@ export const playJjugeulAudio = async (_options: { seed: number }) => {
 
   dryGain.gain.setValueAtTime(0, now)
   wetGain.gain.setValueAtTime(0, now)
-  dryGain.gain.linearRampToValueAtTime(
-    MASTER_GAIN * DRY_GAIN,
+  dryGain.gain.exponentialRampToValueAtTime(
+    Math.max(dryLevel, 0.0001),
     now + ATTACK_TIME,
   )
-  wetGain.gain.linearRampToValueAtTime(
-    MASTER_GAIN * WET_GAIN,
+  wetGain.gain.exponentialRampToValueAtTime(
+    Math.max(wetLevel, 0.0001),
     now + ATTACK_TIME,
   )
 

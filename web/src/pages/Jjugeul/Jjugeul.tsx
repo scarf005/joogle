@@ -36,6 +36,10 @@ import {
   setJjugeulRemoteTotals,
   toggleJjugeulLeaderboard,
 } from "../../stores/jjugeul.ts"
+import {
+  createJjugeulRandom,
+  randomBetween,
+} from "../../utils/jjugeulRandom.ts"
 
 const compactNumber = new Intl.NumberFormat("en-US")
 
@@ -105,6 +109,29 @@ export const Jjugeul = () => {
   }
 
   const currentStudent = getJjugeulActiveStudent()
+  const random = createJjugeulRandom({ seed: jjugeulBurstSeed.value })
+  const impactOffsetX = randomBetween({ random, min: -1.4, max: 1.4 })
+  const impactOffsetY = randomBetween({ random, min: 0.8, max: 2.1 })
+  const bodySquishX = randomBetween({ random, min: 1.04, max: 1.1 })
+  const bodySquishY = randomBetween({ random, min: 0.86, max: 0.94 })
+  const suzumiSquishX = randomBetween({ random, min: 1.05, max: 1.11 })
+  const suzumiSquishY = randomBetween({ random, min: 0.84, max: 0.92 })
+  const handOffsetX = randomBetween({ random, min: -0.6, max: 1.2 })
+  const handOffsetY = randomBetween({ random, min: 16.2, max: 21.3 })
+  const handRotation = randomBetween({ random, min: 0.6, max: 2.7 })
+  const joogleOffsetY = randomBetween({ random, min: 8.2, max: 10.6 })
+  const stageStyle = {
+    "--jjugeul-impact-offset-x": `${impactOffsetX.toFixed(3)}%`,
+    "--jjugeul-impact-offset-y": `${impactOffsetY.toFixed(3)}%`,
+    "--jjugeul-body-squish-x": bodySquishX.toFixed(3),
+    "--jjugeul-body-squish-y": bodySquishY.toFixed(3),
+    "--jjugeul-suzumi-squish-x": suzumiSquishX.toFixed(3),
+    "--jjugeul-suzumi-squish-y": suzumiSquishY.toFixed(3),
+    "--jjugeul-hand-impact-x": `${handOffsetX.toFixed(3)}%`,
+    "--jjugeul-hand-impact-y": `${handOffsetY.toFixed(3)}%`,
+    "--jjugeul-hand-impact-rotate": `${handRotation.toFixed(3)}deg`,
+    "--jjugeul-joogle-impact-y": `${joogleOffsetY.toFixed(3)}%`,
+  } as const
 
   const syncSnapshot = async () => {
     try {
@@ -365,6 +392,7 @@ export const Jjugeul = () => {
         onPointerUp={handleRelease}
         aria-label="JOOGLE"
         data-jjugeul-stage
+        style={stageStyle}
       >
         <span class="jjugeul__spotlight" aria-hidden="true" />
         <span class="jjugeul__mascot-frame" role="img" aria-label="JOOGLE">

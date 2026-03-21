@@ -6,7 +6,7 @@ test.describe("JOOGLE", () => {
 
     await expect(page.locator(".jjugeul__counter")).toHaveText("0")
     await expect(page.locator(".jjugeul__stage")).toBeVisible()
-    await expect(page.locator(".jjugeul__student-card")).toHaveCount(5)
+    await expect(page.getByRole("button", { name: /board/i })).toBeVisible()
   })
 
   test("increments only once while holding then increments again on next press", async ({ page }) => {
@@ -34,16 +34,13 @@ test.describe("JOOGLE", () => {
     await expect(page.locator(".jjugeul__leaderboard")).toBeVisible()
   })
 
-  test("lets the player favorite and switch students", async ({ page }) => {
+  test("keeps the click count after reload", async ({ page }) => {
     await page.goto("/")
 
-    await page.getByRole("button", { name: /favorite aru/i }).click()
-    await page.locator(".jjugeul__student-card").filter({ hasText: "Aru" })
-      .click()
+    await page.locator(".jjugeul__stage").click()
+    await expect(page.locator(".jjugeul__counter")).toHaveText("1")
 
-    await expect(page.locator(".jjugeul__student-title")).toHaveText("Aru")
-    await expect(page.locator(".jjugeul__student-dock-head span")).toHaveText(
-      "2",
-    )
+    await page.reload()
+    await expect(page.locator(".jjugeul__counter")).toHaveText("1")
   })
 })

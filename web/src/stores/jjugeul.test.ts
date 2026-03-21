@@ -35,6 +35,7 @@ describe("jjugeul store", () => {
 
   beforeEach(() => {
     globalThis.localStorage.clear()
+    globalThis.document.cookie = "joogle.jjugeulSession=; path=/; max-age=0"
     resetJjugeulSession()
     releaseJjugeul()
   })
@@ -107,6 +108,24 @@ describe("jjugeul store", () => {
     expect(jjugeulCountryLeaderboard.value).toHaveLength(2)
     expect(jjugeulStudentLeaderboard.value).toHaveLength(2)
     expect(getJjugeulActiveStudentTotal()).toBe(30)
+  })
+
+  it("persists clicks and country totals in a cookie", () => {
+    pressJjugeul()
+    setJjugeulRemoteTotals({
+      countryCode: "KR",
+      countryTotal: 12,
+      globalTotal: 99,
+    })
+
+    expect(globalThis.document.cookie).toContain("joogle.jjugeulSession=")
+
+    resetJjugeulSession()
+    hydrateJjugeulPreferences()
+
+    expect(jjugeulCount.value).toBe(1)
+    expect(jjugeulCountryCode.value).toBe("KR")
+    expect(jjugeulCountryTotal.value).toBe(12)
   })
 
   it("stores favorite students and active selection in local storage", () => {

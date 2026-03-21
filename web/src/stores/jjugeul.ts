@@ -11,6 +11,7 @@ const favoriteStudentsStorageKey = "joogle.favoriteStudents"
 const legacyFavoriteStudentsStorageKey = "jjugeul.favoriteStudents"
 const activeStudentStorageKey = "joogle.activeStudent"
 const legacyActiveStudentStorageKey = "jjugeul.activeStudent"
+const sessionCookieKey = "joogle.jjugeulSession"
 
 export interface JjugeulCountryLeaderboardEntry {
   countryCode: string
@@ -24,10 +25,75 @@ export interface JjugeulStudentLeaderboardEntry {
 
 type PendingClicks = Record<string, number>
 
+type JjugeulSessionCookie = {
+  count: number
+  countryCode: string
+  countryTotal: number
+}
+
 const toStudentKey = (studentId: number) => String(studentId)
 
 const canUseStorage = () => {
   return typeof globalThis !== "undefined" && "localStorage" in globalThis
+}
+
+const canUseCookies = () => {
+  return typeof document !== "undefined" && typeof document.cookie === "string"
+}
+
+const readCookieValue = (key: string) => {
+  if (!canUseCookies()) return null
+
+  const prefix = `${key}=`
+  const entry = document.cookie.split("; ").find((cookie) =>
+    cookie.startsWith(prefix)
+  )
+
+  return entry ? decodeURIComponent(entry.slice(prefix.length)) : null
+}
+
+const writeCookieValue = (key: string, value: string) => {
+  if (!canUseCookies()) return
+
+  document.cookie = `${key}=${
+    encodeURIComponent(value)
+  }; path=/; max-age=2592000; samesite=lax`
+}
+
+const readJjugeulSession = () => {
+  const stored = readCookieValue(sessionCookieKey)
+  if (!stored) return null
+
+  try {
+    const parsed = JSON.parse(stored) as Partial<JjugeulSessionCookie>
+
+    if (
+      typeof parsed.count !== "number" ||
+      typeof parsed.countryCode !== "string" ||
+      typeof parsed.countryTotal !== "number"
+    ) {
+      return null
+    }
+
+    return {
+      count: parsed.count,
+      countryCode: parsed.countryCode,
+      countryTotal: parsed.countryTotal,
+    }
+  } catch {
+    return null
+  }
+}
+
+const writeJjugeulSession = () => {
+  writeCookieValue(
+    sessionCookieKey,
+    JSON.stringify({
+      count: jjugeulCount.value,
+      countryCode: jjugeulCountryCode.value,
+      countryTotal: jjugeulCountryTotal.value,
+    }),
+  )
 }
 
 const readStorageValue = (keys: string[]) => {
@@ -144,6 +210,7 @@ export const pressJjugeul = () => {
   jjugeulPressed.value = true
   jjugeulCount.value += 1
   jjugeulBurstSeed.value += 1
+  writeJjugeulSession()
 
   const studentKey = toStudentKey(jjugeulActiveStudentId.value)
   const currentPending = jjugeulPendingClicks.value[studentKey] ?? 0
@@ -209,6 +276,7 @@ export const setJjugeulRemoteTotals = (options: {
   jjugeulCountryCode.value = options.countryCode
   jjugeulCountryTotal.value = options.countryTotal
   jjugeulGlobalTotal.value = options.globalTotal
+  writeJjugeulSession()
 }
 
 export const setJjugeulLeaderboards = (options: {
@@ -234,11 +302,19 @@ export const toggleJjugeulLeaderboard = () => {
 export const hydrateJjugeulPreferences = () => {
   const favoriteStudentIds = readFavoriteStudentIds()
   const activeStudentId = readActiveStudentId()
+  const session = readJjugeulSession()
 
   jjugeulFavoriteStudentIds.value = favoriteStudentIds
   jjugeulActiveStudentId.value = activeStudentId
 
+  if (session) {
+    jjugeulCount.value = session.count
+    jjugeulCountryCode.value = session.countryCode
+    jjugeulCountryTotal.value = session.countryTotal
+  }
+
   writePreferences()
+  writeJjugeulSession()
 }
 
 export const selectJjugeulStudent = (options: { studentId: number }) => {
