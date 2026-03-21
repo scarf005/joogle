@@ -1,6 +1,11 @@
 FROM cgr.dev/chainguard/rust:latest-dev
 WORKDIR /app
 
+USER root
+RUN apk add --no-cache sqlite-dev
+USER nonroot
+
 RUN cargo install cargo-watch --locked
 
-CMD ["cargo", "watch", "--manifest-path", "server/Cargo.toml", "-x", "run"]
+ENTRYPOINT ["cargo"]
+CMD ["watch", "-x", "run -p server"]

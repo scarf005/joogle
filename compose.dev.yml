@@ -4,7 +4,8 @@ services:
       context: .
       dockerfile: ops/containers/Containerfile.server.dev
     working_dir: /app
-    command: cargo watch --manifest-path server/Cargo.toml -x run
+    entrypoint: ["cargo"]
+    command: ["watch", "-x", "run -p server"]
     environment:
       PORT: 43127
       RUST_LOG: server=info,tower_http=info
@@ -26,6 +27,7 @@ services:
     environment:
       API_ORIGIN: http://server:43127
       DENO_DIR: /deno-dir
+      VITE_WATCH_POLLING: "true"
     depends_on:
       - server
     ports:

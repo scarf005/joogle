@@ -11,7 +11,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use rusqlite::{Connection, OptionalExtension, TransactionBehavior, params};
+use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 use serde::{Deserialize, Serialize};
 use tiny_http::{Header, Method, Request, Response, Server, StatusCode};
 
@@ -502,6 +502,10 @@ fn detect_country_code(request: &Request) -> String {
     .iter()
     .find_map(|name| header_value(request, name))
     .map(sanitize_country_code)
+    .filter(|country_code| country_code != "ZZ")
+    .or_else(|| {
+        header_value(request, "accept-language").and_then(country_code_from_accept_language)
+    })
     .unwrap_or_else(|| "ZZ".to_string())
 }
 
@@ -524,6 +528,20 @@ fn sanitize_country_code(value: &str) -> String {
     } else {
         "ZZ".to_string()
     }
+}
+
+fn country_code_from_accept_language(value: &str) -> Option<String> {
+    value
+        .split(',')
+        .filter_map(|entry| {
+            let locale = entry.split(';').next()?.trim();
+            locale
+                .split('-')
+                .nth(1)
+                .or_else(|| locale.split('_').nth(1))
+                .map(sanitize_country_code)
+        })
+        .find(|country_code| country_code != "ZZ")
 }
 
 fn extract_client_ip(request: &Request) -> IpAddr {
@@ -731,6 +749,19 @@ mod tests {
         assert_eq!(sanitize_country_code(" us "), "US");
         assert_eq!(sanitize_country_code("k0"), "ZZ");
         assert_eq!(sanitize_country_code("korea"), "ZZ");
+    }
+
+    #[test]
+    fn accept_language_can_supply_country_code() {
+        assert_eq!(
+            country_code_from_accept_language("ko-KR,ko;q=0.9,en-US;q=0.8"),
+            Some("KR".to_string())
+        );
+        assert_eq!(
+            country_code_from_accept_language("en_US,en;q=0.9"),
+            Some("US".to_string())
+        );
+        assert_eq!(country_code_from_accept_language("ko,en;q=0.9"), None);
     }
 
     #[test]
