@@ -4,21 +4,24 @@ export interface JjugeulTotals {
   globalTotal: number
 }
 
-export interface JjugeulLeaderboardEntry {
+export interface JjugeulCountryLeaderboardEntry {
   countryCode: string
   total: number
 }
 
-export interface JjugeulLeaderboardResponse {
-  entries: JjugeulLeaderboardEntry[]
+export interface JjugeulStudentLeaderboardEntry {
+  studentId: number
+  total: number
 }
 
 export interface JjugeulLiveResponse {
   totals: JjugeulTotals
-  leaderboard: JjugeulLeaderboardEntry[]
+  countryLeaderboard: JjugeulCountryLeaderboardEntry[]
+  studentLeaderboard: JjugeulStudentLeaderboardEntry[]
 }
 
-interface ClickPayload {
+export interface JjugeulClick {
+  studentId: number
   delta: number
 }
 
@@ -35,32 +38,26 @@ const requestJson = async <T>(options: {
   return await response.json() as T
 }
 
-export const fetchJjugeulTotals = () => {
-  return requestJson<JjugeulTotals>({ path: "/api/jjugeul" })
+export const fetchJjugeulSnapshot = () => {
+  return requestJson<JjugeulLiveResponse>({ path: "/api/jjugeul" })
 }
 
-export const fetchJjugeulLeaderboard = () => {
-  return requestJson<JjugeulLeaderboardResponse>({
-    path: "/api/jjugeul/leaderboard",
-  })
-}
-
-export const postJjugeulClicks = (options: { delta: number }) => {
-  const body: ClickPayload = { delta: options.delta }
-
-  return requestJson<JjugeulTotals>({
+export const postJjugeulClicks = (options: { clicks: JjugeulClick[] }) => {
+  return requestJson<JjugeulLiveResponse>({
     path: "/api/jjugeul",
     init: {
       method: "POST",
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ clicks: options.clicks }),
     },
   })
 }
 
-export const sendBeaconJjugeulClicks = (options: { delta: number }) => {
+export const sendBeaconJjugeulClicks = (
+  options: { clicks: JjugeulClick[] },
+) => {
   if (
     typeof navigator === "undefined" ||
     typeof navigator.sendBeacon !== "function"
@@ -68,8 +65,9 @@ export const sendBeaconJjugeulClicks = (options: { delta: number }) => {
     return false
   }
 
-  const body: ClickPayload = { delta: options.delta }
-  const blob = new Blob([JSON.stringify(body)], { type: "application/json" })
+  const blob = new Blob([JSON.stringify({ clicks: options.clicks })], {
+    type: "application/json",
+  })
 
   return navigator.sendBeacon("/api/jjugeul", blob)
 }
